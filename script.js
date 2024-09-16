@@ -1,5 +1,5 @@
 let currentBalance = 0;
-let startTime = new Date();
+let startTime;
 let chart;
 
 console.log("Script loaded");
@@ -8,12 +8,16 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("DOM fully loaded");
     initializeApp();
     setInterval(updateApp, 1000); // Update every second
+    setInterval(fetchRecentTransactions, 1000); // Fetch transactions every second
 });
 
 function initializeApp() {
     console.log("Initializing app");
-    currentBalance = Math.random() * (16000 - 145) + 145;
-    startTime = new Date();
+    loadSavedData();
+    if (!startTime) {
+        startTime = new Date();
+        currentBalance = Math.random() * (16000 - 145) + 145;
+    }
     updateTodayStats();
     initializeWallet();
     updateMyGains();
@@ -22,18 +26,37 @@ function initializeApp() {
     showTab('today-stats'); // Show Today's Stats tab by default
 }
 
+function loadSavedData() {
+    const savedBalance = localStorage.getItem('currentBalance');
+    const savedStartTime = localStorage.getItem('startTime');
+    if (savedBalance && savedStartTime) {
+        currentBalance = parseFloat(savedBalance);
+        startTime = new Date(parseInt(savedStartTime));
+        console.log("Loaded saved data:", currentBalance, startTime);
+    }
+}
+
+function saveData() {
+    localStorage.setItem('currentBalance', currentBalance.toString());
+    localStorage.setItem('startTime', startTime.getTime().toString());
+    console.log("Saved data:", currentBalance, startTime);
+}
+
 function updateApp() {
     const now = new Date();
     if (now - startTime >= 24 * 60 * 60 * 1000) {
         console.log("24 hours passed, resetting");
-        initializeApp(); // Reset after 24 hours
+        startTime = new Date();
+        currentBalance = Math.random() * (16000 - 145) + 145;
     } else {
         updateTodayStats();
     }
+    saveData();
 }
 
 function updateTodayStats() {
-    currentBalance += Math.random() * 10; // Increase by a random amount up to 10 SOL
+    // Increase by approximately 30 SOL per minute (0.5 SOL per second)
+    currentBalance += 0.5 * (Math.random() * 0.2 + 0.9); // Random factor between 0.9 and 1.1 for slight variation
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
@@ -60,12 +83,17 @@ function updateMyGains() {
 
 function fetchRecentTransactions() {
     console.log("Fetching recent transactions");
+    // Simulated transactions for testing
     const transactions = [
-        { type: 'transfer', amount: '5.3000 SOL', time: '15:30:45', fromAddress: '9nG3...', toAddress: 'Ai9n...' },
-        { type: 'swap', amount: 'Token Swap', time: '15:31:22', fromAddress: 'Bk7m...', toAddress: 'N/A' },
-        { type: 'other', amount: 'Unknown', time: '15:32:01', fromAddress: 'Cx2p...', toAddress: 'N/A' }
+        { type: 'transfer', amount: (Math.random() * 10).toFixed(4) + ' SOL', time: new Date().toLocaleTimeString(), fromAddress: generateRandomAddress(), toAddress: generateRandomAddress() },
+        { type: 'swap', amount: 'Token Swap', time: new Date().toLocaleTimeString(), fromAddress: generateRandomAddress(), toAddress: 'N/A' },
+        { type: 'other', amount: 'Unknown', time: new Date().toLocaleTimeString(), fromAddress: generateRandomAddress(), toAddress: 'N/A' }
     ];
     displayTransactions(transactions);
+}
+
+function generateRandomAddress() {
+    return Math.random().toString(36).substring(2, 6) + '...';
 }
 
 function displayTransactions(transactions) {
