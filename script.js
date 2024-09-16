@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
     initializeWallet();
     showTab('wallet-tab');
+    updateTodayStats();
+    setInterval(updateTodayStats, 1000); // Update every second
 });
 
 function initializeWallet() {
@@ -38,39 +40,37 @@ function getStoredStats() {
     if (storedStats) {
         return JSON.parse(storedStats);
     }
-    return initializeStats();
+    return generateNewStats();
 }
 
-function initializeStats() {
+function generateNewStats() {
     const stats = {
-        startTime: new Date().toISOString(),
-        lastKnownValue: 500.01
+        value: 500.01,
+        lastUpdated: new Date().toISOString()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
     return stats;
 }
 
-function calculateCurrentValue(stats) {
-    const now = new Date();
-    const startTime = new Date(stats.startTime);
-    const elapsedSeconds = (now - startTime) / 1000;
-    const maxStats = 16000.99;
-    const totalSeconds = 24 * 60 * 60; // 24 hours in seconds
-    const increment = (maxStats - 500.01) / totalSeconds;
-    
-    let currentValue = 500.01 + (increment * elapsedSeconds);
-    
-    if (currentValue >= maxStats || elapsedSeconds >= totalSeconds) {
-        return initializeStats().lastKnownValue;
-    }
-    
-    return currentValue;
-}
-
 function updateTodayStats() {
-    const stats = getStoredStats();
-    const currentValue = calculateCurrentValue(stats);
-    document.getElementById("today-stats").textContent = `${currentValue.toFixed(2)} SOL`;
+    let stats = getStoredStats();
+    const maxStats = 16000.99;
+    const increment = (maxStats - 500.01) / (24 * 60 * 60); // Increment per second
+
+    const now = new Date();
+    const timePassed = (now - new Date(stats.lastUpdated)) / 1000; // Time passed in seconds
+    let todayStats = Math.min(maxStats, 500.01 + increment * timePassed);
+
+    if (todayStats >= maxStats) {
+        stats = generateNewStats();
+        todayStats = stats.value;
+    }
+
+    stats.value = todayStats;
+    stats.lastUpdated = now.toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+
+    document.getElementById("today-stats").textContent = `${todayStats.toFixed(2)} SOL`;
 }
 
 // The following functions are kept for future use when implementing actual wallet integration
@@ -131,8 +131,3 @@ async function fetchTransactions(walletAddress) {
         document.getElementById("transactions-list").innerHTML = "Error fetching transactions";
     }
 }
-
-// Update today's stats every 30 seconds (for future use)
-setInterval(() => {
-    updateTodayStats();
-}, 30000);
