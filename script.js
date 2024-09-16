@@ -20,6 +20,8 @@ function initializeApp() {
     if (!startTime) {
         startTime = new Date();
         currentBalance = Math.random() * (16000 - 145) + 145;
+        pooledSol = 10000;
+        sandwichAttacks = 0;
     }
     updateTodayStats();
     initializeWallet();
@@ -33,17 +35,23 @@ function initializeApp() {
 function loadSavedData() {
     const savedBalance = localStorage.getItem('currentBalance');
     const savedStartTime = localStorage.getItem('startTime');
-    if (savedBalance && savedStartTime) {
+    const savedPooledSol = localStorage.getItem('pooledSol');
+    const savedSandwichAttacks = localStorage.getItem('sandwichAttacks');
+    if (savedBalance && savedStartTime && savedPooledSol && savedSandwichAttacks) {
         currentBalance = parseFloat(savedBalance);
         startTime = new Date(parseInt(savedStartTime));
-        console.log("Loaded saved data:", currentBalance, startTime);
+        pooledSol = parseFloat(savedPooledSol);
+        sandwichAttacks = parseInt(savedSandwichAttacks);
+        console.log("Loaded saved data:", currentBalance, startTime, pooledSol, sandwichAttacks);
     }
 }
 
 function saveData() {
     localStorage.setItem('currentBalance', currentBalance.toString());
     localStorage.setItem('startTime', startTime.getTime().toString());
-    console.log("Saved data:", currentBalance, startTime);
+    localStorage.setItem('pooledSol', pooledSol.toString());
+    localStorage.setItem('sandwichAttacks', sandwichAttacks.toString());
+    console.log("Saved data:", currentBalance, startTime, pooledSol, sandwichAttacks);
 }
 
 function updateApp() {
