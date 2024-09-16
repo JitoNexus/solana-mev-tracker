@@ -9,17 +9,19 @@
 </head>
 <body>
     <h1>Solana MEV Tracker</h1>
-    <div id="wallet-info">
+    <div class="tab-buttons">
+        <button onclick="showTab('wallet-tab')">My Wallet</button>
+        <button onclick="showTab('profits-tab')">My Profits</button>
+    </div>
+    <div id="wallet-tab" class="tab-content">
+        <h2>My Wallet</h2>
         <p id="wallet-address"></p>
         <p id="wallet-balance"></p>
+        <p id="wallet-instructions"></p>
     </div>
-    <div id="today-stats-container">
-        <h2>Today's Stats</h2>
-        <p id="today-stats"></p>
-    </div>
-    <div id="transactions-container">
-        <h2>Recent Transactions</h2>
-        <div id="transactions-list"></div>
+    <div id="profits-tab" class="tab-content">
+        <h2>My Profits</h2>
+        <p id="profits-content"></p>
     </div>
     <script src="script.js"></script>
 </body>
