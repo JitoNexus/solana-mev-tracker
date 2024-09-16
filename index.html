@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solana MEV Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Solana MEV Tracker</h1>
+        </div>
+        <div class="tabs">
+            <button class="tab-button" onclick="showTab('home')">Home</button>
+            <button class="tab-button" onclick="showTab('wallet')">My Wallet</button>
+        </div>
+        <div id="home" class="tab-content">
+            <h2>Today Stats</h2>
+            <p id="today-stats">500.01 SOL</p>
+        </div>
+        <div id="wallet" class="tab-content" style="display:none;">
+            <h2>My Wallet</h2>
+            <p id="wallet-address">Loading...</p>
+            <p id="wallet-balance">Loading...</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
