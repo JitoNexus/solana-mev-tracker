@@ -1,6 +1,7 @@
 let currentBalance = 0;
 let startTime;
 let chart;
+let transactions = [];
 
 console.log("Script loaded");
 
@@ -8,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("DOM fully loaded");
     initializeApp();
     setInterval(updateApp, 1000); // Update every second
-    setInterval(fetchRecentTransactions, 1000); // Fetch transactions every second
+    setInterval(addNewTransaction, 1000); // Add a new transaction every second
 });
 
 function initializeApp() {
@@ -21,7 +22,7 @@ function initializeApp() {
     updateTodayStats();
     initializeWallet();
     updateMyGains();
-    fetchRecentTransactions();
+    initializeTransactions();
     initializeStatsGraph();
     showTab('today-stats'); // Show Today's Stats tab by default
 }
@@ -48,6 +49,7 @@ function updateApp() {
         console.log("24 hours passed, resetting");
         startTime = new Date();
         currentBalance = Math.random() * (16000 - 145) + 145;
+        transactions = [];
     } else {
         updateTodayStats();
     }
@@ -81,22 +83,45 @@ function updateMyGains() {
     `;
 }
 
-function fetchRecentTransactions() {
-    console.log("Fetching recent transactions");
-    // Simulated transactions for testing
-    const transactions = [
-        { type: 'transfer', amount: (Math.random() * 10).toFixed(4) + ' SOL', time: new Date().toLocaleTimeString(), fromAddress: generateRandomAddress(), toAddress: generateRandomAddress() },
-        { type: 'swap', amount: 'Token Swap', time: new Date().toLocaleTimeString(), fromAddress: generateRandomAddress(), toAddress: 'N/A' },
-        { type: 'other', amount: 'Unknown', time: new Date().toLocaleTimeString(), fromAddress: generateRandomAddress(), toAddress: 'N/A' }
-    ];
-    displayTransactions(transactions);
+function initializeTransactions() {
+    for (let i = 0; i < 150; i++) {
+        addNewTransaction();
+    }
+    displayTransactions();
+}
+
+function addNewTransaction() {
+    const newTransaction = generateTransaction();
+    transactions.unshift(newTransaction);
+    if (transactions.length > 150) {
+        transactions.pop();
+    }
+    displayTransactions();
+}
+
+function generateTransaction() {
+    const types = ['transfer', 'swap', 'other'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const amount = type === 'transfer' ? (Math.random() * 10).toFixed(4) + ' SOL' : (type === 'swap' ? 'Token Swap' : 'Unknown');
+    return {
+        type: type,
+        amount: amount,
+        time: new Date().toLocaleTimeString(),
+        fromAddress: generateRandomAddress(),
+        toAddress: type === 'transfer' ? generateRandomAddress() : 'N/A',
+        signature: generateRandomSignature()
+    };
 }
 
 function generateRandomAddress() {
-    return Math.random().toString(36).substring(2, 6) + '...';
+    return Math.random().toString(36).substring(2, 10) + '...';
 }
 
-function displayTransactions(transactions) {
+function generateRandomSignature() {
+    return Math.random().toString(36).substring(2, 15) + '...';
+}
+
+function displayTransactions() {
     console.log("Displaying transactions");
     const transactionsList = document.getElementById("transactions-list");
     transactionsList.innerHTML = "";
@@ -108,22 +133,29 @@ function displayTransactions(transactions) {
                 <h3>Nexus Wallet Transfer</h3>
                 <p>Amount: ${tx.amount} transferred at ${tx.time}</p>
                 <p>From: ${tx.fromAddress} To: ${tx.toAddress}</p>
+                <button onclick="openExplorer('${tx.signature}')">View on Explorer</button>
             `;
         } else if (tx.type === 'swap') {
             txElement.innerHTML = `
                 <h3>Nexus Wallet Attack</h3>
                 <p>Token Swap occurred at ${tx.time}</p>
                 <p>Initiated by: ${tx.fromAddress}</p>
+                <button onclick="openExplorer('${tx.signature}')">View on Explorer</button>
             `;
         } else {
             txElement.innerHTML = `
                 <h3>Other Transaction</h3>
                 <p>Unknown transaction type at ${tx.time}</p>
                 <p>Initiated by: ${tx.fromAddress}</p>
+                <button onclick="openExplorer('${tx.signature}')">View on Explorer</button>
             `;
         }
         transactionsList.appendChild(txElement);
     });
+}
+
+function openExplorer(signature) {
+    window.open(`https://explorer.solana.com/tx/${signature}`, '_blank');
 }
 
 function showTab(tabId) {

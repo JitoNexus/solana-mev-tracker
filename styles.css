@@ -83,9 +83,15 @@ h2 {
     border-radius: 5px;
 }
 
+#transactions-list {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
 .transaction {
     background-color: rgba(0, 0, 139, 0.4);
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 0 5px #00ffff;
@@ -99,6 +105,20 @@ h2 {
 .transaction h3 {
     color: #ffff00;
     margin-top: 0;
+}
+
+.transaction button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 3px;
 }
 
 #gains-content {
