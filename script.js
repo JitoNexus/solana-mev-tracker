@@ -11,19 +11,58 @@ document.addEventListener("DOMContentLoaded", function() {
     walletAddressElement.textContent = `Address: ${walletAddress}`;
     walletBalanceElement.textContent = `Balance: ${walletBalance.toFixed(2)} SOL`;
 
-    // Simulate increasing SOL number for Today Stats
+    // Today Stats functionality
     const todayStatsElement = document.getElementById("today-stats");
-    let todayStats = 500.01;
+    const STORAGE_KEY = 'solana_mev_stats';
+
+    function getStoredStats() {
+        const storedStats = localStorage.getItem(STORAGE_KEY);
+        if (storedStats) {
+            const stats = JSON.parse(storedStats);
+            const lastUpdated = new Date(stats.lastUpdated);
+            const now = new Date();
+            
+            // Check if 24 hours have passed
+            if (now - lastUpdated > 24 * 60 * 60 * 1000) {
+                return generateNewStats();
+            }
+            return stats;
+        }
+        return generateNewStats();
+    }
+
+    function generateNewStats() {
+        const newStats = {
+            value: 500.01,
+            lastUpdated: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newStats));
+        return newStats;
+    }
+
+    let stats = getStoredStats();
+    let todayStats = stats.value;
     const maxStats = 16000.99;
     const increment = (maxStats - todayStats) / (24 * 60 * 60); // Increment per second
 
-    setInterval(() => {
+    function updateTodayStats() {
         todayStats += increment;
         if (todayStats >= maxStats) {
-            todayStats = 500.01; // Reset after reaching max
+            stats = generateNewStats();
+            todayStats = stats.value;
         }
         todayStatsElement.textContent = `${todayStats.toFixed(2)} SOL`;
-    }, 1000); // Update every second
+        
+        // Update stored stats
+        stats.value = todayStats;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+    }
+
+    // Initial update
+    updateTodayStats();
+
+    // Update every second
+    setInterval(updateTodayStats, 1000);
 });
 
 function showTab(tabId) {
