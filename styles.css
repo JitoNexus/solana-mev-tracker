@@ -72,3 +72,17 @@ h2 {
     background-color: rgba(0, 0, 139, 0.1);
     border-radius: 5px;
 }
+
+#gains-content {
+    position: relative;
+}
+
+#gains-content::before {
+    content: '🔒';
+    font-size: 48px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-shadow: 0 0 10px #ffff00;
+}

@@ -1,5 +1,6 @@
 let currentBalance = 0;
 let startTime = new Date();
+let chart;
 
 document.addEventListener("DOMContentLoaded", function() {
     initializeApp();
@@ -12,8 +13,9 @@ function initializeApp() {
     updateTodayStats();
     initializeWallet();
     updateMyGains();
-    fetchNexusWalletTransactions();
+    fetchRecentTransactions();
     initializeStatsGraph();
+    showTab('today-stats'); // Show Today's Stats tab by default
 }
 
 function updateApp() {
@@ -22,7 +24,7 @@ function updateApp() {
         initializeApp(); // Reset after 24 hours
     } else {
         updateTodayStats();
-        fetchNexusWalletTransactions();
+        fetchRecentTransactions();
     }
 }
 
@@ -47,13 +49,64 @@ function updateMyGains() {
     `;
 }
 
-function fetchNexusWalletTransactions() {
-    // Simulating real-time data
-    const transactions = [
-        { type: 'transfer', amount: 5.3, time: '3:00 PM', address: '9nG3A2K7...' },
-        { type: 'swap', amount: 1000, time: '5:15 PM', address: 'Ai9n8R42...' }
-    ];
-    displayTransactions(transactions);
+const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+
+async function fetchRecentTransactions() {
+    try {
+        const recentBlockhash = await connection.getRecentBlockhash();
+        const recentBlock = await connection.getBlock(recentBlockhash.blockhash);
+
+        if (!recentBlock || !recentBlock.transactions) {
+            throw new Error("Failed to fetch recent block data");
+        }
+
+        const processedTransactions = recentBlock.transactions
+            .filter(tx => tx.meta && !tx.meta.err)
+            .slice(0, 10) // Limit to 10 transactions
+            .map(tx => {
+                const { transaction, meta } = tx;
+                const isTransfer = transaction.message.instructions.some(ix => 
+                    ix.programId.equals(solanaWeb3.SystemProgram.programId));
+                const isSwap = transaction.message.instructions.some(ix => 
+                    ix.programId.toBase58() === 'SwaPpA9LAaLfeLi3a68M4DjnLqgtticKg6CnyNwgAC8');
+
+                let type, amount, fromAddress, toAddress;
+
+                if (isTransfer) {
+                    type = 'transfer';
+                    const transferIx = transaction.message.instructions.find(ix => 
+                        ix.programId.equals(solanaWeb3.SystemProgram.programId));
+                    if (transferIx) {
+                        amount = meta.postBalances[transferIx.accounts[1]] - meta.preBalances[transferIx.accounts[1]];
+                        fromAddress = transaction.message.accountKeys[transferIx.accounts[0]].toBase58();
+                        toAddress = transaction.message.accountKeys[transferIx.accounts[1]].toBase58();
+                    }
+                } else if (isSwap) {
+                    type = 'swap';
+                    amount = 'Token Swap';
+                    fromAddress = transaction.message.accountKeys[0].toBase58();
+                    toAddress = 'N/A';
+                } else {
+                    type = 'other';
+                    amount = 'Unknown';
+                    fromAddress = transaction.message.accountKeys[0].toBase58();
+                    toAddress = 'N/A';
+                }
+
+                return {
+                    type,
+                    amount: type === 'transfer' ? (amount / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4) + ' SOL' : amount,
+                    time: new Date().toLocaleTimeString(),
+                    fromAddress: fromAddress.slice(0, 4) + '...' + fromAddress.slice(-4),
+                    toAddress: toAddress !== 'N/A' ? toAddress.slice(0, 4) + '...' + toAddress.slice(-4) : toAddress
+                };
+            });
+
+        displayTransactions(processedTransactions);
+    } catch (error) {
+        console.error("Error fetching recent transactions:", error);
+        document.getElementById("transactions-list").innerHTML = "Error fetching transactions";
+    }
 }
 
 function displayTransactions(transactions) {
@@ -64,15 +117,21 @@ function displayTransactions(transactions) {
         txElement.className = "transaction";
         if (tx.type === 'transfer') {
             txElement.innerHTML = `
-                <h3>Nexus Wallet Transfer</h3>
-                <p>Transaction: ${tx.amount} SOL transferred at ${tx.time}</p>
-                <p>Address: ${tx.address} (recipient)</p>
+                <h3>Solana Transfer</h3>
+                <p>Amount: ${tx.amount} transferred at ${tx.time}</p>
+                <p>From: ${tx.fromAddress} To: ${tx.toAddress}</p>
+            `;
+        } else if (tx.type === 'swap') {
+            txElement.innerHTML = `
+                <h3>Token Swap</h3>
+                <p>Token Swap occurred at ${tx.time}</p>
+                <p>Initiated by: ${tx.fromAddress}</p>
             `;
         } else {
             txElement.innerHTML = `
-                <h3>Nexus Wallet Attack</h3>
-                <p>Token Swap: ${tx.amount} USDC swapped at ${tx.time}</p>
-                <p>Address: ${tx.address} (initiated by Nexus)</p>
+                <h3>Other Transaction</h3>
+                <p>Unknown transaction type at ${tx.time}</p>
+                <p>Initiated by: ${tx.fromAddress}</p>
             `;
         }
         transactionsList.appendChild(txElement);
@@ -89,7 +148,7 @@ function showTab(tabId) {
 
 function initializeStatsGraph() {
     const ctx = document.getElementById('stats-graph').getContext('2d');
-    window.statsChart = new Chart(ctx, {
+    chart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: [],
@@ -116,7 +175,6 @@ function initializeStatsGraph() {
 }
 
 function updateStatsGraph() {
-    const chart = window.statsChart;
     const now = new Date();
     chart.data.labels.push(now.toLocaleTimeString());
     chart.data.datasets[0].data.push(currentBalance);
