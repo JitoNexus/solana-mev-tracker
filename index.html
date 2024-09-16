@@ -4,24 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solana MEV Tracker</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Solana MEV Tracker</h1>
-    <div class="tab-buttons">
-        <button onclick="showTab('wallet-tab')">My Wallet</button>
-        <button onclick="showTab('profits-tab')">My Profits</button>
-    </div>
-    <div id="wallet-tab" class="tab-content">
-        <h2>My Wallet</h2>
-        <p id="wallet-address"></p>
-        <p id="wallet-balance"></p>
-        <p id="wallet-instructions"></p>
-    </div>
-    <div id="profits-tab" class="tab-content">
-        <h2>My Profits</h2>
-        <p id="profits-content"></p>
+    <div class="app-container">
+        <nav>
+            <button onclick="showTab('wallet')">Wallet</button>
+            <button onclick="showTab('market')">Market</button>
+            <button onclick="showTab('nexus-wallets')">Nexus Wallets</button>
+        </nav>
+        
+        <div id="wallet" class="tab-content">
+            <h2>Current Balance</h2>
+            <div id="balance"></div>
+            <div id="balance-graph"></div>
+            <button>Send</button>
+            <button>Earn</button>
+            <h3>Today's Stats</h3>
+            <div id="today-stats"></div>
+            <h3>Transaction History</h3>
+            <div id="transaction-history"></div>
+        </div>
+        
+        <div id="market" class="tab-content">
+            <!-- Market content -->
+        </div>
+        
+        <div id="nexus-wallets" class="tab-content">
+            <h2>Nexus Wallets</h2>
+            <div id="nexus-transactions"></div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

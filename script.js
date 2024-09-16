@@ -3,6 +3,8 @@ document.addEventListener("DOMContentLoaded", function() {
     showTab('wallet-tab');
     updateTodayStats();
     setInterval(updateTodayStats, 1000); // Update every second
+    fetchNexusWalletTransactions();
+    setInterval(fetchNexusWalletTransactions, 30000); // Update every 30 seconds
 });
 
 function initializeWallet() {
@@ -71,9 +73,16 @@ function updateTodayStats() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
 
     document.getElementById("today-stats").textContent = `${todayStats.toFixed(2)} SOL`;
+    updateBalanceGraph(todayStats);
 }
 
-// The following functions are kept for future use when implementing actual wallet integration
+function updateBalanceGraph(currentValue) {
+    // This is a placeholder for the graph update
+    // You would use a charting library like Chart.js to actually render the graph
+    console.log("Updating balance graph with value:", currentValue);
+    // Update the graph element here
+}
+
 async function fetchWalletBalance(walletAddress) {
     try {
         const response = await fetch(`https://api.mainnet-beta.solana.com`, {
@@ -130,4 +139,34 @@ async function fetchTransactions(walletAddress) {
         console.error("Error fetching transactions:", error);
         document.getElementById("transactions-list").innerHTML = "Error fetching transactions";
     }
+}
+
+async function fetchNexusWalletTransactions() {
+    try {
+        // This is a placeholder. Replace with actual API call to fetch Nexus Wallet transactions
+        const transactions = [
+            { hash: '0x123...', amount: 200, timestamp: Date.now() },
+            { hash: '0x456...', amount: 150, timestamp: Date.now() - 60000 },
+            // Add more mock transactions as needed
+        ];
+        displayNexusWalletTransactions(transactions);
+    } catch (error) {
+        console.error("Error fetching Nexus Wallet transactions:", error);
+        document.getElementById("nexus-transactions").innerHTML = "Error fetching Nexus Wallet transactions";
+    }
+}
+
+function displayNexusWalletTransactions(transactions) {
+    const nexusElement = document.getElementById("nexus-transactions");
+    nexusElement.innerHTML = "";
+    transactions.forEach(tx => {
+        const txElement = document.createElement("div");
+        txElement.className = "nexus-transaction";
+        txElement.innerHTML = `
+            <a href="https://solscan.io/tx/${tx.hash}" target="_blank">
+                ${tx.hash.substr(0, 10)}... - ${tx.amount} SOL - ${new Date(tx.timestamp).toLocaleString()}
+            </a>
+        `;
+        nexusElement.appendChild(txElement);
+    });
 }
