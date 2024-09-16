@@ -199,7 +199,6 @@ function initializeStatsGraph() {
     chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [],
             datasets: [{
                 label: 'SOL Gained',
                 data: [],
@@ -285,16 +284,20 @@ function updateStatsGraph() {
     }
     console.log("Updating stats graph");
     const now = new Date();
-    chart.data.labels.push(now);
-    chart.data.datasets[0].data.push(currentBalance);
-    chart.data.datasets[1].data.push(pooledSol);
-    chart.data.datasets[2].data.push(sandwichAttacks);
-    if (chart.data.labels.length > 100) {
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-        chart.data.datasets[1].data.shift();
-        chart.data.datasets[2].data.shift();
+    
+    chart.data.datasets[0].data.push({x: now, y: currentBalance});
+    chart.data.datasets[1].data.push({x: now, y: pooledSol});
+    chart.data.datasets[2].data.push({x: now, y: sandwichAttacks});
+
+    if (chart.data.datasets[0].data.length > 100) {
+        chart.data.datasets.forEach(dataset => {
+            dataset.data.shift();
+        });
     }
+
+    chart.options.scales.y.max = Math.max(currentBalance, pooledSol, sandwichAttacks) * 1.1;
+    chart.options.scales.y.min = Math.min(currentBalance, pooledSol, sandwichAttacks) * 0.9;
+
     chart.update();
 }
 
