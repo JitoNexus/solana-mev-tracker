@@ -43,10 +43,13 @@ document.addEventListener("DOMContentLoaded", function() {
     let stats = getStoredStats();
     let todayStats = stats.value;
     const maxStats = 16000.99;
-    const increment = (maxStats - todayStats) / (24 * 60 * 60); // Increment per second
+    const increment = (maxStats - 500.01) / (24 * 60 * 60); // Increment per second
 
     function updateTodayStats() {
-        todayStats += increment;
+        const now = new Date();
+        const timePassed = (now - new Date(stats.lastUpdated)) / 1000; // Time passed in seconds
+        todayStats = Math.min(maxStats, 500.01 + increment * timePassed);
+
         if (todayStats >= maxStats) {
             stats = generateNewStats();
             todayStats = stats.value;
