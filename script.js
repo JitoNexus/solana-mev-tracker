@@ -62,6 +62,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Update every second
     setInterval(updateTodayStats, 1000);
+
+    // Fetch and display transactions
+    fetchTransactions();
 });
 
 function showTab(tabId) {
@@ -71,3 +74,43 @@ function showTab(tabId) {
     }
     document.getElementById(tabId).style.display = "block";
 }
+
+async function fetchTransactions() {
+    const apiUrl = "https://public-api.solscan.io/transaction/last?limit=50";
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        displayTransactions(data);
+    } catch (error) {
+        console.error("Error fetching transactions:", error);
+    }
+}
+
+function displayTransactions(transactions) {
+    const transactionsList = document.getElementById("transactions-list");
+    transactionsList.innerHTML = ""; // Clear existing transactions
+
+    transactions.forEach(tx => {
+        const amount = tx.lamport / 1000000000; // Convert lamports to SOL
+        if (amount > 1) {
+            const txElement = document.createElement("div");
+            txElement.className = "transaction";
+            
+            const date = new Date(tx.blockTime * 1000).toLocaleString();
+            const isTokenSwap = tx.tokenTransfers && tx.tokenTransfers.length > 0;
+            const title = isTokenSwap ? "Nexus MEV Attack" : "Solana Transaction";
+
+            txElement.innerHTML = `
+                <div class="transaction-title">${title}</div>
+                <div class="transaction-amount">${amount.toFixed(2)} SOL</div>
+                <div class="transaction-date">${date}</div>
+            `;
+
+            transactionsList.appendChild(txElement);
+        }
+    });
+}
+
+// Fetch new transactions every 30 seconds
+setInterval(fetchTransactions, 30000);
