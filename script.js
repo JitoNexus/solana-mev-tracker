@@ -1,5 +1,6 @@
 let currentBalance = 0;
 let pooledSol = 10000; // Starting pooled SOL
+let sandwichAttacks = 0; // Starting sandwich attacks
 let startTime;
 let chart;
 let transactions = [];
@@ -25,7 +26,7 @@ function initializeApp() {
     updateMyGains();
     initializeTransactions();
     initializeStatsGraph();
-    explainPooledSol();
+    explainChartLines();
     showTab('today-stats'); // Show Today's Stats tab by default
 }
 
@@ -65,6 +66,9 @@ function updateTodayStats() {
     // Update pooled SOL
     pooledSol += (Math.random() - 0.5) * 100; // Random increase or decrease
     pooledSol = Math.max(500, Math.min(20000, pooledSol)); // Keep between 500 and 20000
+
+    // Update sandwich attacks
+    sandwichAttacks += Math.floor(Math.random() * 3); // Random increase between 0 and 2
 
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
@@ -145,29 +149,22 @@ function displayTransactions() {
                 <h3>Nexus Wallet Transfer</h3>
                 <p>Amount: ${tx.amount} transferred at ${tx.time}</p>
                 <p>From: ${tx.fromAddress} To: ${tx.toAddress}</p>
-                <button onclick="openExplorer('${tx.signature}')">View on Explorer</button>
             `;
         } else if (tx.type === 'swap') {
             txElement.innerHTML = `
                 <h3>Nexus Wallet Attack</h3>
                 <p>Token Swap occurred at ${tx.time}</p>
                 <p>Initiated by: ${tx.fromAddress}</p>
-                <button onclick="openExplorer('${tx.signature}')">View on Explorer</button>
             `;
         } else {
             txElement.innerHTML = `
                 <h3>Other Transaction</h3>
                 <p>Unknown transaction type at ${tx.time}</p>
                 <p>Initiated by: ${tx.fromAddress}</p>
-                <button onclick="openExplorer('${tx.signature}')">View on Explorer</button>
             `;
         }
         transactionsList.appendChild(txElement);
     });
-}
-
-function openExplorer(signature) {
-    window.open(`https://explorer.solana.com/tx/${signature}`, '_blank');
 }
 
 function showTab(tabId) {
@@ -202,6 +199,14 @@ function initializeStatsGraph() {
                 label: 'SOL Pooled',
                 data: [],
                 borderColor: 'rgba(255, 0, 0, 1)',
+                borderWidth: 2,
+                fill: false,
+                pointRadius: 0
+            },
+            {
+                label: 'Sandwich Attacks',
+                data: [],
+                borderColor: 'rgba(0, 255, 0, 1)',
                 borderWidth: 2,
                 fill: false,
                 pointRadius: 0
@@ -260,19 +265,22 @@ function updateStatsGraph() {
     chart.data.labels.push(now);
     chart.data.datasets[0].data.push(currentBalance);
     chart.data.datasets[1].data.push(pooledSol);
+    chart.data.datasets[2].data.push(sandwichAttacks);
     if (chart.data.labels.length > 100) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
         chart.data.datasets[1].data.shift();
+        chart.data.datasets[2].data.shift();
     }
     chart.update();
 }
 
-function explainPooledSol() {
-    const explanation = document.createElement('p');
-    explanation.textContent = "The red line represents the SOL pooled by all users together to perform MEV attacks. This pool fluctuates as users contribute and withdraw funds, and as MEV opportunities are exploited.";
-    explanation.style.color = 'rgba(255, 255, 255, 0.7)';
-    explanation.style.fontSize = '14px';
-    explanation.style.marginTop = '10px';
+function explainChartLines() {
+    const explanation = document.createElement('div');
+    explanation.innerHTML = `
+        <p style="color: rgba(0, 255, 255, 0.7); font-size: 14px; margin-top: 10px;">The blue line represents the SOL gained by all users collectively.</p>
+        <p style="color: rgba(255, 0, 0, 0.7); font-size: 14px; margin-top: 5px;">The red line represents the SOL pooled by all users together to perform MEV attacks. This pool fluctuates as users contribute and withdraw funds, and as MEV opportunities are exploited.</p>
+        <p style="color: rgba(0, 255, 0, 0.7); font-size: 14px; margin-top: 5px;">The green line represents the number of successful sandwich attacks performed.</p>
+    `;
     document.getElementById('today-stats').appendChild(explanation);
 }
