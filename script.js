@@ -29,7 +29,11 @@ function updateApp() {
 }
 
 function updateTodayStats() {
-    currentBalance += Math.random() * 0.1; // Random increase
+    const elapsedTime = (new Date() - startTime) / 1000; // Time elapsed in seconds
+    const maxIncrease = 16000 - currentBalance; // Maximum possible increase
+    const increaseRate = maxIncrease / (24 * 60 * 60); // Increase rate per second
+    currentBalance += increaseRate * (Math.random() * 0.5 + 0.75); // Random increase between 75% and 125% of the average rate
+
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
     document.getElementById("stats-description").textContent = 
         `🚀 Jito Nexus Users have collectively earned ${currentBalance.toFixed(2)} SOL today! Watch as the balance grows throughout the day, showcasing the power of MEV strategies. Earnings reset every 24 hours, so keep an eye on the graph to see the real-time impact!`;
@@ -37,16 +41,14 @@ function updateTodayStats() {
 }
 
 function initializeWallet() {
-    document.getElementById("wallet-instructions").textContent = 
-        "💼 To activate your Jito Nexus wallet and start earning, head over to our bot and type /get_wallet. Deposit 2 SOL to activate your wallet and unlock the power of MEV strategies!";
+    document.getElementById("wallet-instructions").innerHTML = 
+        "💼 To activate your Jito Nexus wallet and start earning, head over to our bot and type <strong>/get_wallet</strong>. Deposit 2 SOL to activate your wallet and unlock the power of MEV strategies!";
     document.getElementById("wallet-balance").textContent = "Balance: 0 SOL";
 }
 
 function updateMyGains() {
-    const gainsContent = document.getElementById("gains-content");
-    gainsContent.innerHTML = `
-        <p>🔒 Locked: To access your gains, please deposit 2 SOL. Head to the bot and type /get_wallet to obtain your wallet and make the deposit. Unlock the potential of your earnings once you've activated your account!</p>
-    `;
+    document.getElementById("gains-message").innerHTML = 
+        "🔒 Locked: To access your gains, please deposit 2 SOL. Head to the bot and type <strong>/get_wallet</strong> to obtain your wallet and make the deposit. Unlock the potential of your earnings once you've activated your account!";
 }
 
 const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
@@ -117,13 +119,13 @@ function displayTransactions(transactions) {
         txElement.className = "transaction";
         if (tx.type === 'transfer') {
             txElement.innerHTML = `
-                <h3>Solana Transfer</h3>
+                <h3>Nexus Wallet Transfer</h3>
                 <p>Amount: ${tx.amount} transferred at ${tx.time}</p>
                 <p>From: ${tx.fromAddress} To: ${tx.toAddress}</p>
             `;
         } else if (tx.type === 'swap') {
             txElement.innerHTML = `
-                <h3>Token Swap</h3>
+                <h3>Nexus Wallet Attack</h3>
                 <p>Token Swap occurred at ${tx.time}</p>
                 <p>Initiated by: ${tx.fromAddress}</p>
             `;
@@ -141,9 +143,9 @@ function displayTransactions(transactions) {
 function showTab(tabId) {
     const tabs = document.getElementsByClassName("tab-content");
     for (let tab of tabs) {
-        tab.style.display = "none";
+        tab.classList.remove("active");
     }
-    document.getElementById(tabId).style.display = "block";
+    document.getElementById(tabId).classList.add("active");
 }
 
 function initializeStatsGraph() {
@@ -157,7 +159,8 @@ function initializeStatsGraph() {
                 data: [],
                 borderColor: 'rgba(0, 255, 255, 1)',
                 borderWidth: 2,
-                fill: false
+                fill: false,
+                pointRadius: 0
             }]
         },
         options: {
@@ -166,8 +169,34 @@ function initializeStatsGraph() {
                 duration: 0
             },
             scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'hour',
+                        displayFormats: {
+                            hour: 'HH:mm'
+                        }
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
                 y: {
-                    beginAtZero: false
+                    beginAtZero: false,
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
                 }
             }
         }
@@ -176,9 +205,9 @@ function initializeStatsGraph() {
 
 function updateStatsGraph() {
     const now = new Date();
-    chart.data.labels.push(now.toLocaleTimeString());
+    chart.data.labels.push(now);
     chart.data.datasets[0].data.push(currentBalance);
-    if (chart.data.labels.length > 50) {
+    if (chart.data.labels.length > 100) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
     }

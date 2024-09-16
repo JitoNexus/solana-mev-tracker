@@ -17,7 +17,7 @@
             <button onclick="showTab('nexus-wallet')">Nexus Wallet</button>
         </nav>
         
-        <div id="today-stats" class="tab-content">
+        <div id="today-stats" class="tab-content active">
             <h2>Today's Stats</h2>
             <div id="sol-balance"></div>
             <p id="stats-description"></p>
@@ -32,7 +32,10 @@
         
         <div id="my-gains" class="tab-content">
             <h2>My Gains</h2>
-            <div id="gains-content"></div>
+            <div id="gains-content">
+                <span class="lock-icon">🔒</span>
+                <p id="gains-message"></p>
+            </div>
         </div>
         
         <div id="nexus-wallet" class="tab-content">
