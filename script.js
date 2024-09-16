@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log("DOM fully loaded");
     initializeApp();
     setInterval(updateApp, 1000); // Update every second
-    setInterval(fetchRecentTransactions, 30000); // Fetch transactions every 30 seconds
 });
 
 function initializeApp() {
@@ -34,16 +33,7 @@ function updateApp() {
 }
 
 function updateTodayStats() {
-    const now = new Date();
-    const elapsedSeconds = (now - startTime) / 1000;
-    const totalSeconds = 24 * 60 * 60; // 24 hours in seconds
-    const progressRatio = elapsedSeconds / totalSeconds;
-    
-    const maxIncrease = 16000 - currentBalance;
-    const increase = maxIncrease * progressRatio * (0.5 + Math.random() * 0.5); // Random factor between 0.5 and 1
-    
-    currentBalance += increase;
-
+    currentBalance += Math.random() * 10; // Increase by a random amount up to 10 SOL
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
@@ -70,7 +60,6 @@ function updateMyGains() {
 
 function fetchRecentTransactions() {
     console.log("Fetching recent transactions");
-    // Simulated transactions for testing
     const transactions = [
         { type: 'transfer', amount: '5.3000 SOL', time: '15:30:45', fromAddress: '9nG3...', toAddress: 'Ai9n...' },
         { type: 'swap', amount: 'Token Swap', time: '15:31:22', fromAddress: 'Bk7m...', toAddress: 'N/A' },
@@ -113,17 +102,22 @@ function showTab(tabId) {
     console.log("Showing tab:", tabId);
     const tabs = document.getElementsByClassName("tab-content");
     for (let tab of tabs) {
-        tab.classList.remove("active");
+        tab.style.display = "none";
     }
-    document.getElementById(tabId).classList.add("active");
+    document.getElementById(tabId).style.display = "block";
 }
 
 function initializeStatsGraph() {
     console.log("Initializing stats graph");
-    const ctx = document.getElementById('stats-graph').getContext('2d');
+    const ctx = document.getElementById('stats-graph');
+    if (!ctx) {
+        console.error("Canvas element not found");
+        return;
+    }
     chart = new Chart(ctx, {
         type: 'line',
         data: {
+            labels: [],
             datasets: [{
                 label: 'SOL Balance',
                 data: [],
@@ -174,11 +168,17 @@ function initializeStatsGraph() {
 }
 
 function updateStatsGraph() {
+    if (!chart) {
+        console.error("Chart not initialized");
+        return;
+    }
     console.log("Updating stats graph");
     const now = new Date();
-    chart.data.datasets[0].data.push({x: now, y: currentBalance});
-    if (chart.data.datasets[0].data.length > 100) {
+    chart.data.labels.push(now);
+    chart.data.datasets[0].data.push(currentBalance);
+    if (chart.data.labels.length > 100) {
+        chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
     }
-    chart.update('none'); // Update without animation for smoother updates
+    chart.update();
 }
