@@ -2,7 +2,7 @@ let currentBalance = 0;
 let pooledSol = 10000; // Starting pooled SOL
 let sandwichAttacks = 0; // Starting sandwich attacks
 let startTime;
-let chart;
+let solGainedChart, solPooledChart, sandwichAttacksChart;
 let transactions = [];
 
 console.log("Script loaded");
@@ -27,7 +27,7 @@ function initializeApp() {
     initializeWallet();
     updateMyGains();
     initializeTransactions();
-    initializeStatsGraph();
+    initializeStatsGraphs();
     explainChartLines();
     showTab('today-stats'); // Show Today's Stats tab by default
 }
@@ -87,7 +87,7 @@ function updateTodayStats() {
     document.getElementById("sandwich-attacks").textContent = `${sandwichAttacks} Sandwich Attacks`;
     document.getElementById("stats-description").textContent = 
         `🚀 Jito Nexus Users have collectively earned ${currentBalance.toFixed(2)} SOL today! Watch as the balance grows throughout the day, showcasing the power of MEV strategies. Earnings reset every 24 hours, so keep an eye on the graph to see the real-time impact!`;
-    updateStatsGraph();
+    updateStatsGraphs();
 }
 
 function initializeWallet() {
@@ -189,36 +189,26 @@ function showTab(tabId) {
     document.getElementById(tabId).style.display = "block";
 }
 
-function initializeStatsGraph() {
-    console.log("Initializing stats graph");
-    const ctx = document.getElementById('stats-graph');
+function initializeStatsGraphs() {
+    console.log("Initializing stats graphs");
+    solGainedChart = createChart('sol-gained-chart', 'SOL Gained', 'rgba(0, 255, 255, 1)');
+    solPooledChart = createChart('sol-pooled-chart', 'SOL Pooled', 'rgba(255, 0, 0, 1)');
+    sandwichAttacksChart = createChart('sandwich-attacks-chart', 'Sandwich Attacks', 'rgba(0, 255, 0, 1)');
+}
+
+function createChart(canvasId, label, color) {
+    const ctx = document.getElementById(canvasId);
     if (!ctx) {
-        console.error("Canvas element not found");
-        return;
+        console.error(`Canvas element not found: ${canvasId}`);
+        return null;
     }
-    chart = new Chart(ctx, {
+    return new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{
-                label: 'SOL Gained',
+                label: label,
                 data: [],
-                borderColor: 'rgba(0, 255, 255, 1)',
-                borderWidth: 2,
-                fill: false,
-                pointRadius: 0
-            },
-            {
-                label: 'SOL Pooled',
-                data: [],
-                borderColor: 'rgba(255, 0, 0, 1)',
-                borderWidth: 2,
-                fill: false,
-                pointRadius: 0
-            },
-            {
-                label: 'Sandwich Attacks',
-                data: [],
-                borderColor: 'rgba(0, 255, 0, 1)',
+                borderColor: color,
                 borderWidth: 2,
                 fill: false,
                 pointRadius: 0
@@ -277,27 +267,24 @@ function initializeStatsGraph() {
     });
 }
 
-function updateStatsGraph() {
+function updateStatsGraphs() {
+    const now = new Date();
+    updateChart(solGainedChart, now, currentBalance);
+    updateChart(solPooledChart, now, pooledSol);
+    updateChart(sandwichAttacksChart, now, sandwichAttacks);
+}
+
+function updateChart(chart, now, value) {
     if (!chart) {
         console.error("Chart not initialized");
         return;
     }
-    console.log("Updating stats graph");
-    const now = new Date();
-    
-    chart.data.datasets[0].data.push({x: now, y: currentBalance});
-    chart.data.datasets[1].data.push({x: now, y: pooledSol});
-    chart.data.datasets[2].data.push({x: now, y: sandwichAttacks});
-
+    chart.data.datasets[0].data.push({x: now, y: value});
     if (chart.data.datasets[0].data.length > 100) {
-        chart.data.datasets.forEach(dataset => {
-            dataset.data.shift();
-        });
+        chart.data.datasets[0].data.shift();
     }
-
-    chart.options.scales.y.max = Math.max(currentBalance, pooledSol, sandwichAttacks) * 1.1;
-    chart.options.scales.y.min = Math.min(currentBalance, pooledSol, sandwichAttacks) * 0.9;
-
+    chart.options.scales.y.max = Math.max(...chart.data.datasets[0].data.map(point => point.y)) * 1.1;
+    chart.options.scales.y.min = Math.min(...chart.data.datasets[0].data.map(point => point.y)) * 0.9;
     chart.update();
 }
 
@@ -307,9 +294,9 @@ function explainChartLines() {
         <p id="sol-balance" style="color: rgba(0, 255, 255, 1); font-size: 18px; font-weight: bold; margin-top: 10px;"></p>
         <p id="pooled-sol" style="color: rgba(255, 0, 0, 1); font-size: 18px; font-weight: bold; margin-top: 5px;"></p>
         <p id="sandwich-attacks" style="color: rgba(0, 255, 0, 1); font-size: 18px; font-weight: bold; margin-top: 5px;"></p>
-        <p style="color: rgba(0, 255, 255, 0.7); font-size: 14px; margin-top: 10px;">The blue line represents the SOL gained by all users collectively.</p>
-        <p style="color: rgba(255, 0, 0, 0.7); font-size: 14px; margin-top: 5px;">The red line represents the SOL pooled by all users together to perform MEV attacks. This pool fluctuates as users contribute and withdraw funds, and as MEV opportunities are exploited.</p>
-        <p style="color: rgba(0, 255, 0, 0.7); font-size: 14px; margin-top: 5px;">The green line represents the number of successful sandwich attacks performed.</p>
+        <p style="color: rgba(0, 255, 255, 0.7); font-size: 14px; margin-top: 10px;">The blue chart represents the SOL gained by all users collectively.</p>
+        <p style="color: rgba(255, 0, 0, 0.7); font-size: 14px; margin-top: 5px;">The red chart represents the SOL pooled by all users together to perform MEV attacks. This pool fluctuates as users contribute and withdraw funds, and as MEV opportunities are exploited.</p>
+        <p style="color: rgba(0, 255, 0, 0.7); font-size: 14px; margin-top: 5px;">The green chart represents the number of successful sandwich attacks performed.</p>
     `;
     document.getElementById('today-stats').appendChild(explanation);
 }
