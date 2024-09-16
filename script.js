@@ -26,7 +26,6 @@ document.addEventListener("DOMContentLoaded", function() {
     function initializeStats() {
         const stats = {
             startTime: new Date().toISOString(),
-            lastUpdateTime: new Date().toISOString(),
             lastKnownValue: 500.01
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
@@ -35,18 +34,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function calculateCurrentValue(stats) {
         const now = new Date();
-        const lastUpdateTime = new Date(stats.lastUpdateTime);
-        const elapsedSeconds = (now - lastUpdateTime) / 1000;
+        const startTime = new Date(stats.startTime);
+        const elapsedSeconds = (now - startTime) / 1000;
         const maxStats = 16000.99;
         const totalSeconds = 24 * 60 * 60; // 24 hours in seconds
         const increment = (maxStats - 500.01) / totalSeconds;
         
-        let currentValue = stats.lastKnownValue + (increment * elapsedSeconds);
+        let currentValue = 500.01 + (increment * elapsedSeconds);
         
-        const startTime = new Date(stats.startTime);
-        const totalElapsedSeconds = (now - startTime) / 1000;
-        
-        if (currentValue >= maxStats || totalElapsedSeconds >= totalSeconds) {
+        if (currentValue >= maxStats || elapsedSeconds >= totalSeconds) {
             // Reset if max value reached or 24 hours passed
             return initializeStats().lastKnownValue;
         }
@@ -59,11 +55,6 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateTodayStats() {
         const currentValue = calculateCurrentValue(stats);
         todayStatsElement.textContent = `${currentValue.toFixed(2)} SOL`;
-        
-        // Update stored stats
-        stats.lastUpdateTime = new Date().toISOString();
-        stats.lastKnownValue = currentValue;
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
     }
 
     // Initial update
