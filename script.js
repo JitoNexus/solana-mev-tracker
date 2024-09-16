@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM fully loaded");
     initializeWallet();
     updateTodayStats();
     fetchTransactions();
+    console.log("Initial functions called");
 });
 
 const STORAGE_KEY = 'solana_mev_stats';
@@ -9,6 +11,7 @@ const STORAGE_KEY = 'solana_mev_stats';
 function initializeWallet() {
     const urlParams = new URLSearchParams(window.location.search);
     const walletAddress = urlParams.get('wallet');
+    console.log("Wallet address from URL:", walletAddress);  // Debug line added
 
     if (walletAddress) {
         document.getElementById("wallet-address").textContent = `Address: ${walletAddress}`;
@@ -82,8 +85,10 @@ function updateTodayStats() {
 async function fetchTransactions() {
     const urlParams = new URLSearchParams(window.location.search);
     const walletAddress = urlParams.get('wallet');
+    console.log("Fetching transactions for wallet:", walletAddress);  // Debug line added
 
     if (!walletAddress) {
+        console.log("No wallet address provided for transactions");  // Debug line added
         document.getElementById("transactions-list").innerHTML = "No wallet address provided";
         return;
     }
