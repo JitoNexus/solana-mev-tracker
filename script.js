@@ -52,6 +52,8 @@ function updateApp() {
         console.log("24 hours passed, resetting");
         startTime = new Date();
         currentBalance = Math.random() * (16000 - 145) + 145;
+        pooledSol = 10000;
+        sandwichAttacks = 0;
         transactions = [];
     } else {
         updateTodayStats();
@@ -142,19 +144,20 @@ function generateValidSignature() {
 function displayTransactions() {
     console.log("Displaying transactions");
     const transactionsList = document.getElementById("transactions-list");
-    transactionsList.innerHTML = "";
+    transactionsList.innerHTML = '';
     transactions.forEach(tx => {
-        const txElement = document.createElement("div");
-        txElement.className = "transaction";
+        const txElement = document.createElement('div');
+        txElement.className = 'transaction';
         if (tx.type === 'transfer') {
             txElement.innerHTML = `
-                <h3>Nexus Wallet Transfer</h3>
-                <p>Amount: ${tx.amount} transferred at ${tx.time}</p>
-                <p>From: ${tx.fromAddress} To: ${tx.toAddress}</p>
+                <h3>Transfer</h3>
+                <p>${tx.amount} transferred at ${tx.time}</p>
+                <p>From: ${tx.fromAddress}</p>
+                <p>To: ${tx.toAddress}</p>
             `;
         } else if (tx.type === 'swap') {
             txElement.innerHTML = `
-                <h3>Nexus Wallet Attack</h3>
+                <h3>Swap</h3>
                 <p>Token Swap occurred at ${tx.time}</p>
                 <p>Initiated by: ${tx.fromAddress}</p>
             `;
