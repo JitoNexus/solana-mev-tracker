@@ -70,15 +70,18 @@ function updateApp() {
 }
 
 function updateTodayStats() {
-    // Increase by approximately 30 SOL per minute (0.5 SOL per second)
-    currentBalance += 0.5 * (Math.random() * 0.2 + 0.9); // Random factor between 0.9 and 1.1 for slight variation
-    
-    // Update pooled SOL
-    pooledSol += (Math.random() - 0.5) * 100; // Random increase or decrease
+    // Update SOL Gained (more dynamic)
+    const gainFactor = Math.random() * 2 + 0.5; // Random factor between 0.5 and 2.5
+    currentBalance += gainFactor * (Math.random() * 0.2 + 0.9); // More variation
+
+    // Update pooled SOL (add more jitter)
+    const poolChange = (Math.random() - 0.5) * 200; // Increased range of change
+    pooledSol += poolChange;
     pooledSol = Math.max(500, Math.min(20000, pooledSol)); // Keep between 500 and 20000
 
-    // Update sandwich attacks
-    sandwichAttacks += Math.floor(Math.random() * 3); // Random increase between 0 and 2
+    // Update sandwich attacks (add more jitter)
+    const attackChange = Math.floor(Math.random() * 5) - 1; // Can decrease by 1, increase by up to 3
+    sandwichAttacks = Math.max(0, sandwichAttacks + attackChange); // Ensure it doesn't go below 0
 
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
