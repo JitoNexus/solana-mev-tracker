@@ -3,36 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solana MEV Tracker</title>
+    <title>Jito Nexus - Solana MEV Tracker</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
         <nav>
-            <button onclick="showTab('wallet')">Wallet</button>
-            <button onclick="showTab('market')">Market</button>
-            <button onclick="showTab('nexus-wallets')">Nexus Wallets</button>
+            <button onclick="showTab('today-stats')">Today's Stats</button>
+            <button onclick="showTab('my-wallet')">My Wallet</button>
+            <button onclick="showTab('my-gains')">My Gains</button>
+            <button onclick="showTab('nexus-wallet')">Nexus Wallet</button>
         </nav>
         
-        <div id="wallet" class="tab-content">
-            <h2>Current Balance</h2>
-            <div id="balance"></div>
-            <div id="balance-graph"></div>
-            <button>Send</button>
-            <button>Earn</button>
-            <h3>Today's Stats</h3>
-            <div id="today-stats"></div>
-            <h3>Transaction History</h3>
-            <div id="transaction-history"></div>
+        <div id="today-stats" class="tab-content">
+            <h2>Today's Stats</h2>
+            <div id="sol-balance"></div>
+            <p id="stats-description"></p>
+            <canvas id="stats-graph"></canvas>
         </div>
         
-        <div id="market" class="tab-content">
-            <!-- Market content -->
+        <div id="my-wallet" class="tab-content">
+            <h2>My Wallet</h2>
+            <p id="wallet-instructions"></p>
+            <div id="wallet-balance"></div>
         </div>
         
-        <div id="nexus-wallets" class="tab-content">
-            <h2>Nexus Wallets</h2>
-            <div id="nexus-transactions"></div>
+        <div id="my-gains" class="tab-content">
+            <h2>My Gains</h2>
+            <div id="gains-content"></div>
+        </div>
+        
+        <div id="nexus-wallet" class="tab-content">
+            <h2>Nexus Wallet</h2>
+            <div id="transactions-list"></div>
         </div>
     </div>
     <script src="script.js"></script>

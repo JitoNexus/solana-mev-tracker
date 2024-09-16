@@ -1,13 +1,13 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #1a1a1a;
-    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    background-color: #0a0a2a;
+    color: #00ffff;
     margin: 0;
     padding: 0;
 }
 
 .app-container {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
 }
@@ -19,51 +19,56 @@ nav {
 }
 
 button {
-    background-color: #3d5afe;
-    color: white;
+    background-color: #00008b;
+    color: #ffff00;
     border: none;
     padding: 10px 20px;
-    border-radius: 20px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px #00ffff;
+}
+
+button:hover {
+    background-color: #0000cd;
+    box-shadow: 0 0 20px #00ffff;
 }
 
 .tab-content {
-    background-color: #2a2a2a;
+    background-color: rgba(0, 0, 139, 0.2);
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 20px;
+    box-shadow: 0 0 15px #00ffff;
 }
 
-#balance {
+h2 {
+    color: #ffff00;
+    text-shadow: 0 0 10px #ffff00;
+}
+
+#sol-balance {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
+    text-shadow: 0 0 10px #00ffff;
 }
 
-#balance-graph {
-    height: 200px;
-    background-color: #3a3a3a;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-
-#transaction-history, #nexus-transactions {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-#transaction-history div, #nexus-transactions div {
-    background-color: #3a3a3a;
+.transaction {
+    background-color: rgba(0, 0, 139, 0.4);
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 5px;
+    box-shadow: 0 0 5px #00ffff;
 }
 
-a {
-    color: #3d5afe;
-    text-decoration: none;
+.transaction h3 {
+    color: #ffff00;
+    margin-top: 0;
 }
 
-a:hover {
-    text-decoration: underline;
+#stats-graph {
+    margin-top: 20px;
+    background-color: rgba(0, 0, 139, 0.1);
+    border-radius: 5px;
 }
