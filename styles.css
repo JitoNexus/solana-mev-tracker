@@ -73,8 +73,7 @@ h2 {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-width: 300px;
-    margin: 0 auto;
+    padding: 10px;
 }
 
 .stat-item {
@@ -92,13 +91,17 @@ h2 {
     margin-right: 15px;
 }
 
-.stat-item p {
+.stat-text {
+    flex-grow: 1;
+}
+
+.stat-text p {
     margin: 0;
     font-size: 14px;
     color: #00ffff;
 }
 
-.stat-item span {
+.stat-text span {
     display: block;
     font-weight: bold;
     font-size: 18px;
@@ -112,11 +115,11 @@ h2 {
         margin-right: 10px;
     }
     
-    .stat-item p {
+    .stat-text p {
         font-size: 12px;
     }
     
-    .stat-item span {
+    .stat-text span {
         font-size: 16px;
     }
 }
