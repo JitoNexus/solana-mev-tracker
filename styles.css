@@ -71,76 +71,45 @@ h2 {
 
 .stats-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    flex-direction: column;
     gap: 10px;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .stat-item {
-    flex-basis: calc(50% - 5px);
+    display: flex;
+    align-items: center;
     background-color: rgba(0, 0, 139, 0.4);
     border-radius: 10px;
     padding: 10px;
-    text-align: center;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.stat-item.large {
-    flex-basis: 100%;
-}
-
-.stat-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    margin-bottom: 5px;
 }
 
 .stat-icon-img {
     width: 40px;
     height: 40px;
-    object-fit: contain;
-}
-
-.stat-icon-img.large {
-    width: 50px;
-    height: 50px;
+    margin-right: 15px;
 }
 
 .stat-item p {
     margin: 0;
     font-size: 14px;
-    line-height: 1.2;
+    color: #00ffff;
 }
 
 .stat-item span {
-    font-weight: bold;
-    font-size: 16px;
     display: block;
-    margin-top: 2px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #ffff00;
 }
 
 @media (max-width: 400px) {
-    .stat-icon {
-        width: 50px;
-        height: 50px;
-    }
-    
     .stat-icon-img {
-        width: 35px;
-        height: 35px;
-    }
-    
-    .stat-icon-img.large {
-        width: 45px;
-        height: 45px;
+        width: 32px;
+        height: 32px;
+        margin-right: 10px;
     }
     
     .stat-item p {
@@ -148,7 +117,7 @@ h2 {
     }
     
     .stat-item span {
-        font-size: 14px;
+        font-size: 16px;
     }
 }
 
