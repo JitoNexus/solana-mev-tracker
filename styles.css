@@ -4,6 +4,8 @@ body {
     color: #00ffff;
     margin: 0;
     padding: 0;
+    background-image: linear-gradient(45deg, #0a0a2a 25%, #0d0d35 25%, #0d0d35 50%, #0a0a2a 50%, #0a0a2a 75%, #0d0d35 75%, #0d0d35 100%);
+    background-size: 56.57px 56.57px;
 }
 
 .app-container {
@@ -16,6 +18,7 @@ nav {
     display: flex;
     justify-content: space-around;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 button {
@@ -27,6 +30,7 @@ button {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 0 10px #00ffff;
+    margin: 5px;
 }
 
 button:hover {
@@ -60,19 +64,53 @@ button:hover {
 h2 {
     color: #ffff00;
     text-shadow: 0 0 10px #ffff00;
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
-#sol-balance {
-    font-size: 36px;
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    background-color: rgba(0, 0, 139, 0.4);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    text-align: center;
+    flex: 1;
+    min-width: 150px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.stat-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    color: #ffffff;
+}
+
+#sol-balance, #pooled-sol, #sandwich-attacks {
+    font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
     text-shadow: 0 0 10px #00ffff;
+    text-align: center;
 }
 
 #stats-description {
     font-size: 18px;
     line-height: 1.5;
     margin-bottom: 20px;
+    text-align: center;
 }
 
 #transactions-list {
@@ -113,7 +151,7 @@ h2 {
     border-radius: 3px;
 }
 
-#gains-content {
+#gains-content, #help {
     position: relative;
     padding: 20px;
     text-align: center;
@@ -131,7 +169,6 @@ h2 {
     line-height: 1.5;
 }
 
-/* New styles for charts */
 .charts-container {
     display: flex;
     flex-wrap: wrap;
@@ -169,4 +206,22 @@ h2 {
 canvas {
     width: 100% !important;
     height: 200px !important;
+}
+
+#help ol {
+    text-align: left;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+#help button {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-top: 20px;
+}
+
+#help button:hover {
+    background-color: #45a049;
 }

