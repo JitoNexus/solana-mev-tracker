@@ -71,13 +71,13 @@ h2 {
 
 .stats-container {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 10px;
 }
 
 .stat-row {
     display: flex;
-    justify-content: space-between;
+    width: 100%;
     gap: 10px;
 }
 
@@ -102,41 +102,49 @@ h2 {
     font-size: 20px;
     margin-bottom: 5px;
     display: inline-block;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
     border-radius: 50%;
     color: #ffffff;
 }
 
 .stat-icon-img {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
 }
 
 .stat-item p {
     margin: 0;
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .stat-item span {
     font-weight: bold;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 @media (max-width: 600px) {
+    .stat-row {
+        flex-direction: row;
+    }
+    
+    .stat-item.small {
+        min-width: calc(50% - 5px);
+    }
+    
     .stat-icon-img {
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
     }
     
     .stat-item p {
-        font-size: 10px;
+        font-size: 12px;
     }
     
     .stat-item span {
-        font-size: 12px;
+        font-size: 14px;
     }
 }
 
