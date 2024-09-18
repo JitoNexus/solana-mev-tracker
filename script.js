@@ -4,6 +4,8 @@ let sandwichAttacks = 0; // Starting sandwich attacks
 let activeUsers = 0;
 let ongoingMEV = 0;
 let ongoingArbitrage = 0;
+let ongoingSandwich = 0;
+let ongoingSnipes = 0;
 let startTime;
 let solGainedChart, solPooledChart, sandwichAttacksChart;
 let transactions = [];
@@ -28,6 +30,8 @@ function initializeApp() {
         activeUsers = Math.floor(Math.random() * (30000 - 1900) + 1900);
         ongoingMEV = Math.floor(Math.random() * 1000);
         ongoingArbitrage = Math.floor(Math.random() * 500);
+        ongoingSandwich = 0;
+        ongoingSnipes = 0;
     }
     updateGlobalNexusStats();
     initializeWallet();
@@ -46,7 +50,9 @@ function loadSavedData() {
     const savedActiveUsers = localStorage.getItem('activeUsers');
     const savedOngoingMEV = localStorage.getItem('ongoingMEV');
     const savedOngoingArbitrage = localStorage.getItem('ongoingArbitrage');
-    if (savedBalance && savedStartTime && savedPooledSol && savedSandwichAttacks && savedActiveUsers && savedOngoingMEV && savedOngoingArbitrage) {
+    const savedOngoingSandwich = localStorage.getItem('ongoingSandwich');
+    const savedOngoingSnipes = localStorage.getItem('ongoingSnipes');
+    if (savedBalance && savedStartTime && savedPooledSol && savedSandwichAttacks && savedActiveUsers && savedOngoingMEV && savedOngoingArbitrage && savedOngoingSandwich && savedOngoingSnipes) {
         currentBalance = parseFloat(savedBalance);
         startTime = new Date(parseInt(savedStartTime));
         pooledSol = parseFloat(savedPooledSol);
@@ -54,7 +60,9 @@ function loadSavedData() {
         activeUsers = parseInt(savedActiveUsers);
         ongoingMEV = parseInt(savedOngoingMEV);
         ongoingArbitrage = parseInt(savedOngoingArbitrage);
-        console.log("Loaded saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage);
+        ongoingSandwich = parseInt(savedOngoingSandwich);
+        ongoingSnipes = parseInt(savedOngoingSnipes);
+        console.log("Loaded saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage, ongoingSandwich, ongoingSnipes);
     }
 }
 
@@ -66,7 +74,9 @@ function saveData() {
     localStorage.setItem('activeUsers', activeUsers.toString());
     localStorage.setItem('ongoingMEV', ongoingMEV.toString());
     localStorage.setItem('ongoingArbitrage', ongoingArbitrage.toString());
-    console.log("Saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage);
+    localStorage.setItem('ongoingSandwich', ongoingSandwich.toString());
+    localStorage.setItem('ongoingSnipes', ongoingSnipes.toString());
+    console.log("Saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage, ongoingSandwich, ongoingSnipes);
 }
 
 function updateApp() {
@@ -80,6 +90,8 @@ function updateApp() {
         activeUsers = Math.floor(Math.random() * (30000 - 1900) + 1900);
         ongoingMEV = Math.floor(Math.random() * 1000);
         ongoingArbitrage = Math.floor(Math.random() * 500);
+        ongoingSandwich = 0;
+        ongoingSnipes = 0;
         transactions = [];
     } else {
         updateGlobalNexusStats();
@@ -108,12 +120,18 @@ function updateGlobalNexusStats() {
     ongoingMEV = Math.max(0, ongoingMEV);
     ongoingArbitrage += Math.floor(Math.random() * 11) - 5; // Change by -5 to +5
     ongoingArbitrage = Math.max(0, ongoingArbitrage);
+    ongoingSandwich += Math.floor(Math.random() * 11) - 5; // Change by -5 to +5
+    ongoingSandwich = Math.max(0, ongoingSandwich);
+    ongoingSnipes += Math.floor(Math.random() * 11) - 5; // Change by -5 to +5
+    ongoingSnipes = Math.max(0, ongoingSnipes);
 
     console.log("Updating stats, current balance:", currentBalance.toFixed(2));
 
     document.getElementById("active-users").innerHTML = `Active Users: <span>${activeUsers.toLocaleString()}</span>`;
     document.getElementById("ongoing-mev").innerHTML = `Ongoing MEV: <span>${ongoingMEV.toLocaleString()}</span>`;
     document.getElementById("ongoing-arbitrage").innerHTML = `Ongoing Arbitrage: <span>${ongoingArbitrage.toLocaleString()}</span>`;
+    document.getElementById("ongoing-sandwich").innerHTML = `Ongoing Sandwich: <span>${ongoingSandwich.toLocaleString()}</span>`;
+    document.getElementById("ongoing-snipes").innerHTML = `Ongoing Snipes: <span>${ongoingSnipes.toLocaleString()}</span>`;
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL Gained`;
     document.getElementById("pooled-sol").textContent = `${pooledSol.toFixed(2)} SOL Pooled`;
     document.getElementById("sandwich-attacks").textContent = `${sandwichAttacks} Sandwich Attacks`;
