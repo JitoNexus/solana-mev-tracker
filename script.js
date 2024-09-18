@@ -131,7 +131,7 @@ function updateGlobalNexusStats() {
     document.getElementById("ongoing-mev").innerHTML = `Ongoing MEV: <span>${ongoingMEV.toLocaleString()}</span>`;
     document.getElementById("ongoing-arbitrage").innerHTML = `Ongoing Arbitrage: <span>${ongoingArbitrage.toLocaleString()}</span>`;
     document.getElementById("ongoing-sandwich").innerHTML = `Ongoing Sandwich: <span>${ongoingSandwich.toLocaleString()}</span>`;
-    document.getElementById("ongoing-snipes").innerHTML = `Ongoing Snipes: <span>${ongoingSnipes.toLocaleString()}</span>`;
+    document.getElementById("ongoing-snipes").textContent = ongoingSnipes;
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL Gained`;
     document.getElementById("pooled-sol").textContent = `${pooledSol.toFixed(2)} SOL Pooled`;
     document.getElementById("sandwich-attacks").textContent = `${sandwichAttacks} Sandwich Attacks`;
