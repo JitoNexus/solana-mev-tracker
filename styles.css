@@ -72,22 +72,22 @@ h2 {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px;
+    gap: 20px;
+    padding: 20px;
 }
 
 .stat-item {
     background-color: rgba(0, 0, 139, 0.4);
     border-radius: 10px;
-    padding: 15px;
+    padding: 20px;
     text-align: center;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
 }
 
 .stat-icon-img {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 10px;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 15px;
     object-fit: contain;
 }
 
@@ -103,7 +103,7 @@ h2 {
 
 .stat-text p {
     margin: 0;
-    font-size: 16px;
+    font-size: 18px;
     color: #00ffff;
 }
 
@@ -117,8 +117,8 @@ h2 {
 
 @media (max-width: 400px) {
     .stat-icon-img {
-        width: 50px;
-        height: 50px;
+        width: 150px;
+        height: 150px;
     }
     
     .stat-item:last-child .stat-icon-img {
@@ -127,7 +127,7 @@ h2 {
     }
     
     .stat-text p {
-        font-size: 14px;
+        font-size: 16px;
     }
     
     .stat-text span {
@@ -264,8 +264,8 @@ canvas {
 }
 
 .stat-icon-img {
-    width: 24px;
-    height: 24px;
+    width: 200px;
+    height: 200px;
     vertical-align: middle;
 }
 
