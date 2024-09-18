@@ -85,9 +85,15 @@ h2 {
 }
 
 .stat-icon-img {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 10px;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+}
+
+.stat-item:last-child .stat-icon-img {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
 }
 
 .stat-text {
@@ -110,8 +116,13 @@ h2 {
 
 @media (max-width: 400px) {
     .stat-icon-img {
-        width: 50px;
-        height: 50px;
+        width: 60px;
+        height: 60px;
+    }
+    
+    .stat-item:last-child .stat-icon-img {
+        width: 150px;
+        height: 150px;
     }
     
     .stat-text p {
