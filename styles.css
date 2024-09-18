@@ -85,9 +85,10 @@ h2 {
 }
 
 .stat-icon-img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 15px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+    object-fit: contain;
 }
 
 .stat-item:last-child .stat-icon-img {
@@ -116,8 +117,8 @@ h2 {
 
 @media (max-width: 400px) {
     .stat-icon-img {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
     }
     
     .stat-item:last-child .stat-icon-img {
@@ -266,4 +267,14 @@ canvas {
     width: 24px;
     height: 24px;
     vertical-align: middle;
+}
+
+.snipes-item {
+    padding: 30px 20px;
+}
+
+.snipes-icon {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
 }
