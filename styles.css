@@ -1,7 +1,7 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #0a0a2a;
-    color: #00ffff;
+    background-color: #000033; /* Dark blue background */
+    color: #ffffff;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-image: linear-gradient(45deg, #0a0a2a 25%, #0d0d35 25%, #0d0d35 50%, #0a0a2a 50%, #0a0a2a 75%, #0d0d35 75%, #0d0d35 100%);
@@ -74,27 +74,33 @@ h2 {
     flex-direction: column;
     gap: 20px;
     padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .stat-item {
-    background-color: rgba(0, 0, 139, 0.4);
+    background-color: rgba(0, 0, 139, 0.2);
     border-radius: 10px;
     padding: 20px;
     text-align: center;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background-color: rgba(0, 0, 139, 0.3);
+    transform: translateY(-5px);
 }
 
 .stat-icon-img {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     margin-bottom: 15px;
     object-fit: contain;
+    transition: transform 0.3s ease;
 }
 
-.stat-item:last-child .stat-icon-img {
-    width: 200px;
-    height: 200px;
-    margin-bottom: 20px;
+.stat-item:hover .stat-icon-img {
+    transform: scale(1.1);
 }
 
 .stat-text {
@@ -117,22 +123,26 @@ h2 {
 
 @media (max-width: 400px) {
     .stat-icon-img {
-        width: 150px;
-        height: 150px;
+        width: 120px;
+        height: 120px;
     }
     
-    .stat-item:last-child .stat-icon-img {
-        width: 150px;
-        height: 150px;
-    }
-    
-    .stat-text p {
+    .stat-item p {
         font-size: 16px;
     }
     
-    .stat-text span {
+    .stat-item span {
         font-size: 20px;
     }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.stat-item {
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 #sol-balance, #pooled-sol, #sandwich-attacks {
