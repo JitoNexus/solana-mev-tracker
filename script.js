@@ -363,9 +363,8 @@ function getWallet() {
 }
 
 function updateUserName() {
-    // In a real app, you'd get this from the user's session or API
-    // For now, we'll use a placeholder
-    userName = "Telegram User"; // Replace with actual user's name from Telegram when available
+    // Replace with actual logic to fetch the user's Telegram username
+    userName = "Actual Telegram Username"; // Fetch this from your user session or API
     document.getElementById("user-name").textContent = userName;
 }
 
@@ -444,7 +443,7 @@ function startNexus() {
 }
 
 function updateBalance() {
-    document.getElementById("sol-balance").textContent = "0.00 SOL";
+    document.getElementById("sol-balance").textContent = "0.00 SOL"; // Set to 0
 }
 
 // Update the existing setInterval calls
