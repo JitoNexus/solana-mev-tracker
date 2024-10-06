@@ -351,3 +351,9 @@ function explainChartLines() {
 function getWallet() {
     alert("To get your wallet address, please use the Telegram bot and type /get_wallet. Then deposit 2 SOL to start earning!");
 }
+
+function showOverview() {
+    document.querySelector('.start-screen').style.display = 'none';
+    document.getElementById('overview').style.display = 'block';
+    initializeStatsGraphs(); // Call this to initialize charts
+}
