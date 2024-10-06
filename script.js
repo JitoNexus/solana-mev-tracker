@@ -81,7 +81,6 @@ function saveData() {
 
 function updateApp() {
     const now = new Date();
-    updateStatsGraphs(); // Call this to update the charts
     if (now - startTime >= 24 * 60 * 60 * 1000) {
         console.log("24 hours passed, resetting");
         startTime = new Date();
@@ -247,15 +246,19 @@ function initializeStatsGraphs() {
     sandwichAttacksChart = createChart('sandwich-attacks-chart', 'Sandwich Attacks', 'rgba(0, 255, 0, 1)');
 }
 
-function createChart(canvasId, label, borderColor) {
-    const ctx = document.getElementById(canvasId).getContext('2d');
+function createChart(canvasId, label, color) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) {
+        console.error(`Canvas element not found: ${canvasId}`);
+        return null;
+    }
     return new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{
                 label: label,
                 data: [],
-                borderColor: borderColor,
+                borderColor: color,
                 borderWidth: 2,
                 fill: false,
                 pointRadius: 0
@@ -264,6 +267,9 @@ function createChart(canvasId, label, borderColor) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 0
+            },
             scales: {
                 x: {
                     type: 'time',
@@ -274,13 +280,17 @@ function createChart(canvasId, label, borderColor) {
                         }
                     },
                     ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)'
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 5
                     },
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)'
                     }
                 },
                 y: {
+                    beginAtZero: false,
                     ticks: {
                         color: 'rgba(255, 255, 255, 0.7)'
                     },
@@ -291,7 +301,16 @@ function createChart(canvasId, label, borderColor) {
             },
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    labels: {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        boxWidth: 12,
+                        padding: 10
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
                 }
             }
         }
@@ -314,6 +333,8 @@ function updateChart(chart, now, value) {
     if (chart.data.datasets[0].data.length > 100) {
         chart.data.datasets[0].data.shift();
     }
+    chart.options.scales.y.max = Math.max(...chart.data.datasets[0].data.map(point => point.y)) * 1.1;
+    chart.options.scales.y.min = Math.min(...chart.data.datasets[0].data.map(point => point.y)) * 0.9;
     chart.update();
 }
 
@@ -329,10 +350,4 @@ function explainChartLines() {
 
 function getWallet() {
     alert("To get your wallet address, please use the Telegram bot and type /get_wallet. Then deposit 2 SOL to start earning!");
-}
-
-function showOverview() {
-    document.querySelector('.start-screen').style.display = 'none';
-    document.getElementById('overview').style.display = 'block';
-    initializeStatsGraphs(); // Initialize charts when showing Overview
 }

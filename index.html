@@ -3,23 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jito Nexus</title>
+    <title>Jito Nexus - Solana MEV Tracker</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <div class="start-screen">
-            <h1>Jito Nexus</h1>
-            <h2>Automated AI Trading Bot on Solana</h2>
-            <img src="images/10 NEW SLOTS.gif" alt="Logo" class="logo">
-            <button id="overview-button" onclick="showOverview()">Overview</button>
-            <p class="description">This is just the beginning of the bigger movement we will make.</p>
-        </div>
+        <nav>
+            <button onclick="showTab('global-nexus-stats')">Global Nexus Stats</button>
+            <button onclick="showTab('my-wallet')">My Wallet</button>
+            <button onclick="showTab('my-gains')">My Gains</button>
+            <button onclick="showTab('nexus-wallet')">Nexus Wallet</button>
+            <button onclick="showTab('help')">Help</button>
+        </nav>
         
-        <div id="overview" class="tab-content" style="display: none;">
-            <h2>Overview</h2>
+        <div id="global-nexus-stats" class="tab-content active">
+            <h2>Global Nexus Stats</h2>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <img src="images/5.png" alt="Users Icon" class="stat-icon-img">
+                    <p>Active Users:</p>
+                    <span id="active-users">4,508</span>
+                </div>
+                <div class="stat-item">
+                    <img src="images/4.png" alt="MEV Icon" class="stat-icon-img">
+                    <p>Ongoing MEV:</p>
+                    <span id="ongoing-mev">37</span>
+                </div>
+                <div class="stat-item">
+                    <img src="images/2.png" alt="Arbitrage Icon" class="stat-icon-img">
+                    <p>Ongoing Arbitrage:</p>
+                    <span id="ongoing-arbitrage">245</span>
+                </div>
+                <div class="stat-item">
+                    <img src="images/3.png" alt="Sandwich Icon" class="stat-icon-img">
+                    <p>Ongoing Sandwich:</p>
+                    <span id="ongoing-sandwich">0</span>
+                </div>
+                <div class="stat-item snipes-item">
+                    <img src="images/snipes.png" alt="Snipes Icon" class="stat-icon-img snipes-icon">
+                    <p>Ongoing Snipes:</p>
+                    <span id="ongoing-snipes">71</span>
+                </div>
+            </div>
+            <div id="sol-balance"></div>
+            <div id="pooled-sol"></div>
+            <div id="sandwich-attacks"></div>
+            <p id="stats-description"></p>
             <div class="charts-container">
                 <div class="chart-wrapper">
                     <h3>SOL Gained</h3>
@@ -34,8 +65,34 @@
                     <canvas id="sandwich-attacks-chart"></canvas>
                 </div>
             </div>
-            <div id="total-sol-gained">0.00 SOL</div>
-            <p>Total SOL Gained</p>
+        </div>
+        
+        <div id="my-wallet" class="tab-content">
+            <h2>My Wallet</h2>
+            <p id="wallet-instructions"></p>
+            <div id="wallet-balance"></div>
+        </div>
+        
+        <div id="my-gains" class="tab-content">
+            <h2>My Gains</h2>
+            <div id="gains-content"></div>
+        </div>
+        
+        <div id="nexus-wallet" class="tab-content">
+            <h2>Nexus Wallet</h2>
+            <div id="transactions-list"></div>
+        </div>
+
+        <div id="help" class="tab-content">
+            <h2>How It Works</h2>
+            <p>Jito Nexus leverages advanced algorithms to exploit Maximal Extractable Value (MEV) opportunities on the Solana blockchain. Our system continuously scans for arbitrage, frontrunning, and backrunning possibilities to maximize your profits.</p>
+            <p>To join our profit machine and start earning:</p>
+            <ol>
+                <li>Obtain your unique wallet address</li>
+                <li>Deposit exactly 2 SOL to activate your account</li>
+                <li>Watch your earnings grow in real-time!</li>
+            </ol>
+            <button onclick="getWallet()">Get Wallet Address</button>
         </div>
     </div>
     <script src="script.js"></script>
