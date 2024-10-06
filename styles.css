@@ -332,3 +332,18 @@ canvas {
     height: 200px;
     margin-bottom: 20px;
 }
+
+@media (max-width: 768px) {
+    .app-container {
+        padding: 10px;
+    }
+
+    .chart-wrapper {
+        width: 100%;
+    }
+
+    nav button {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+}

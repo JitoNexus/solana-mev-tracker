@@ -48,6 +48,7 @@ function initializeApp() {
     initializeStatsGraphs();
     explainChartLines();
     showTab('global-nexus-stats'); // Show Global Nexus Stats tab by default
+    updateBalance();
 }
 
 function loadSavedData() {
@@ -363,7 +364,8 @@ function getWallet() {
 
 function updateUserName() {
     // In a real app, you'd get this from the user's session or API
-    userName = "JohnDoe"; // Replace with actual user's name from Telegram
+    // For now, we'll use a placeholder
+    userName = "Telegram User"; // Replace with actual user's name from Telegram when available
     document.getElementById("user-name").textContent = userName;
 }
 
@@ -439,6 +441,10 @@ function updateMainChart() {
 
 function startNexus() {
     window.location.href = "https://t.me/your_bot_username?start=get_wallet";
+}
+
+function updateBalance() {
+    document.getElementById("sol-balance").textContent = "0.00 SOL";
 }
 
 // Update the existing setInterval calls
