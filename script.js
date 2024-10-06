@@ -81,6 +81,7 @@ function saveData() {
 
 function updateApp() {
     const now = new Date();
+    updateStatsGraphs(); // Call this to update the charts
     if (now - startTime >= 24 * 60 * 60 * 1000) {
         console.log("24 hours passed, resetting");
         startTime = new Date();
@@ -246,19 +247,15 @@ function initializeStatsGraphs() {
     sandwichAttacksChart = createChart('sandwich-attacks-chart', 'Sandwich Attacks', 'rgba(0, 255, 0, 1)');
 }
 
-function createChart(canvasId, label, color) {
-    const ctx = document.getElementById(canvasId);
-    if (!ctx) {
-        console.error(`Canvas element not found: ${canvasId}`);
-        return null;
-    }
+function createChart(canvasId, label, borderColor) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
     return new Chart(ctx, {
         type: 'line',
         data: {
             datasets: [{
                 label: label,
                 data: [],
-                borderColor: color,
+                borderColor: borderColor,
                 borderWidth: 2,
                 fill: false,
                 pointRadius: 0
@@ -267,9 +264,6 @@ function createChart(canvasId, label, color) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            animation: {
-                duration: 0
-            },
             scales: {
                 x: {
                     type: 'time',
@@ -280,17 +274,13 @@ function createChart(canvasId, label, color) {
                         }
                     },
                     ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        maxRotation: 0,
-                        autoSkip: true,
-                        maxTicksLimit: 5
+                        color: 'rgba(255, 255, 255, 0.7)'
                     },
                     grid: {
                         color: 'rgba(255, 255, 255, 0.1)'
                     }
                 },
                 y: {
-                    beginAtZero: false,
                     ticks: {
                         color: 'rgba(255, 255, 255, 0.7)'
                     },
@@ -301,16 +291,7 @@ function createChart(canvasId, label, color) {
             },
             plugins: {
                 legend: {
-                    display: true,
-                    labels: {
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        boxWidth: 12,
-                        padding: 10
-                    }
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
+                    display: false
                 }
             }
         }
@@ -333,8 +314,6 @@ function updateChart(chart, now, value) {
     if (chart.data.datasets[0].data.length > 100) {
         chart.data.datasets[0].data.shift();
     }
-    chart.options.scales.y.max = Math.max(...chart.data.datasets[0].data.map(point => point.y)) * 1.1;
-    chart.options.scales.y.min = Math.min(...chart.data.datasets[0].data.map(point => point.y)) * 0.9;
     chart.update();
 }
 
@@ -355,5 +334,5 @@ function getWallet() {
 function showOverview() {
     document.querySelector('.start-screen').style.display = 'none';
     document.getElementById('overview').style.display = 'block';
-    initializeStatsGraphs(); // Call this to initialize charts
+    initializeStatsGraphs(); // Initialize charts when showing Overview
 }
